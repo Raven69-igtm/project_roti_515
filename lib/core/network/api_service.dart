@@ -3,11 +3,11 @@
 class ApiService {
   /// Alamat dasar server API (Host) yang sedang digunakan.
   static String get baseUrl =>
-      'https://food-backend-production-0817.up.railway.app/api';
+      'https://roti515-api.vercel.app/api';
 
   /// Alamat Domain (tanpa rute /api) untuk memanggil resource statis seperti gambar.
   static String get baseDomain =>
-      'https://food-backend-production-0817.up.railway.app';
+      'https://roti515-api.vercel.app';
 
   // --- DAFTAR ENDPOINT AUTENTIKASI ---
   // Rute untuk melakukan login (POST)
@@ -37,6 +37,7 @@ class ApiService {
 
   // Endpoint untuk user: batalkan, hapus pesanan, dan rating
   static String cancelOrderById(int id) => '$baseUrl/orders/$id/cancel';
+  static String confirmOrderPickupById(int id) => '$baseUrl/orders/$id/confirm';
   static String userOrderById(int id) => '$baseUrl/orders/$id';
   static String ratingByFoodId(int foodId) => '$baseUrl/foods/$foodId/rating';
 
@@ -44,6 +45,9 @@ class ApiService {
   static String notificationById(int id) => '$baseUrl/notifications/$id';
   static String get deleteAllNotifications => '$baseUrl/notifications/all';
   static String get deleteAllUserOrders => '$baseUrl/user/orders/all';
+
+  // Endpoint rekap bulanan admin (filter by month & year)
+  static String adminMonthlyStats(int month, int year) => '$baseUrl/admin/stats?month=$month&year=$year';
 
   /// Link Folder Statis di Server: Tempat semua gambar di-upload dan disimpan.
   static String get staticFiles => '$baseDomain/static/';
@@ -53,15 +57,18 @@ class ApiService {
   static String getDisplayImage(String? path) {
     if (path == null || path.isEmpty) return '';
     
-    // 1. Jika path sudah berupa URL lengkap (misal link Google), gunakan langsung.
+    // 1. Jika path adalah Base64 Data URL (dari upload foto), kembalikan langsung.
+    if (path.startsWith('data:image')) return path;
+
+    // 2. Jika path sudah berupa URL lengkap (misal link Google), gunakan langsung.
     if (path.startsWith('http')) return path;
 
-    // 2. Jika path diawali dengan '/static', gabungkan dengan baseDomain server.
+    // 3. Jika path diawali dengan '/static', gabungkan dengan baseDomain server.
     if (path.startsWith('/static')) {
       return '$baseDomain$path';
     }
 
-    // 3. Jika hanya nama file (misal: 'roti.png'), tambahkan prefix folder static server.
+    // 4. Jika hanya nama file (misal: 'roti.png'), tambahkan prefix folder static server.
     final cleaned = path.startsWith('/') ? path : '/$path';
     return '$baseDomain/static$cleaned';
   }

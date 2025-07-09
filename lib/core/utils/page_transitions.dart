@@ -45,3 +45,33 @@ class ScaleFadePageRoute<T> extends PageRouteBuilder<T> {
           reverseTransitionDuration: Duration(milliseconds: 350),
         );
 }
+
+/// Route khusus untuk membuka pesan notifikasi dengan efek zoom dramatis.
+/// Scale dari 0.75 → 1.0 dengan easeOutBack (sedikit bounce) + fade in.
+class ZoomPageRoute<T> extends PageRouteBuilder<T> {
+  final Widget page;
+
+  ZoomPageRoute({required this.page})
+      : super(
+          pageBuilder: (context, animation, secondaryAnimation) => page,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final scaleCurve = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            );
+            final fadeCurve = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOut,
+            );
+            return FadeTransition(
+              opacity: fadeCurve,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.75, end: 1.0).animate(scaleCurve),
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 400),
+          reverseTransitionDuration: const Duration(milliseconds: 300),
+        );
+}
