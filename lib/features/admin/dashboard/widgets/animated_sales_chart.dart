@@ -15,13 +15,11 @@ class AnimatedSalesChart extends StatefulWidget {
 }
 
 class _AnimatedSalesChartState extends State<AnimatedSalesChart> {
-  // Helper untuk memformat bulan ke bahasa Indonesia
   String _formatMonth(int month) {
     final months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     return months[month - 1];
   }
 
-  // Helper untuk memformat tanggal ke "DD MMM 2026"
   String _formatFullDate(String dateStr) {
     try {
       final dt = DateTime.parse(dateStr);
@@ -31,7 +29,6 @@ class _AnimatedSalesChartState extends State<AnimatedSalesChart> {
     }
   }
 
-  // Helper untuk memformat tanggal ke "DD MMM"
   String _formatShortDate(String dateStr) {
     try {
       final dt = DateTime.parse(dateStr);
@@ -41,189 +38,147 @@ class _AnimatedSalesChartState extends State<AnimatedSalesChart> {
     }
   }
 
+  String _formatRupiah(dynamic value) {
+    final num amount = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
+    final int intAmount = amount.toInt();
+    final String s = intAmount.toString();
+    final buf = StringBuffer('Rp ');
+    final mod = s.length % 3;
+    buf.write(s.substring(0, mod == 0 ? 3 : mod));
+    for (int i = (mod == 0 ? 3 : mod); i < s.length; i += 3) {
+      buf.write('.');
+      buf.write(s.substring(i, i + 3));
+    }
+    return buf.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<AdminStatsProvider>(context);
     final rawDailyStats = statsProvider.stats['daily_stats'] as List<dynamic>;
     
-    // Siapkan spots dan labels dari data provider
     final List<FlSpot> spots = [];
     final List<String> days = [];
-    double maxRevenue = 1.0;
+    double highestRevenue = 0;
 
     if (rawDailyStats.isEmpty) {
-      // Fallback jika data kosong (tampilkan flat line)
       for (int i = 0; i < 7; i++) {
         spots.add(FlSpot(i.toDouble(), 0));
         days.add("-");
       }
     } else {
+      // Find highest revenue for scaling
+      for (var item in rawDailyStats) {
+        final double r = (item['revenue'] as num).toDouble();
+        if (r > highestRevenue) highestRevenue = r;
+      }
+
       for (int i = 0; i < rawDailyStats.length; i++) {
         final double rev = (rawDailyStats[i]['revenue'] as num).toDouble();
-        // Skala revenue (misal / 10.000 agar muat di chart y-axis 0-10)
-        spots.add(FlSpot(i.toDouble(), rev / 10000)); 
+        spots.add(FlSpot(i.toDouble(), rev)); 
         days.add(_formatShortDate(rawDailyStats[i]['date']));
-        if (rev / 10000 > maxRevenue) maxRevenue = rev / 10000;
       }
     }
 
-    final chartMaxY = (maxRevenue * 1.2).clamp(5.0, double.infinity);
+    // Set maxY to highest + 25% cushion, minimum 1000 for empty state
+    final chartMaxY = (highestRevenue > 0 ? highestRevenue * 1.25 : 1000.0);
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: context.colors.white,
-        borderRadius: BorderRadius.circular(48),
-        border: Border.all(color: context.colors.primaryOrange.withValues(alpha: 0.05)),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           )
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Grafik Penjualan Harian 2026",
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: context.colors.textGrey,
-                    ),
-                  ),
-                  Text(
-                    statsProvider.stats['total_sales'] != null 
-                        ? "Rp ${(statsProvider.stats['total_sales'] as num).toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}"
-                        : "Rp 0",
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: context.colors.textDark,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: context.colors.success.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(9999),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.arrow_upward_rounded, color: context.colors.success, size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      statsProvider.stats['sales_growth'] ?? "0%",
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.success,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-          SizedBox(height: 24),
-
-          // Interaktif Drag/Scroll Chart dengan Animasi Naik
+          _buildHeader(context, statsProvider),
+          const SizedBox(height: 32),
           SizedBox(
-            height: 180, 
+            height: 220, // Increased height for better visibility
             width: double.infinity,
             child: ScrollConfiguration(
               behavior: ScrollConfiguration.of(context).copyWith(
-                dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                  PointerDeviceKind.trackpad,
-                },
+                dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse, PointerDeviceKind.trackpad},
               ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                reverse: true, // Mulai dari sisi paling kanan (data hari ini)
-                controller: ScrollController(),
-                physics: BouncingScrollPhysics(),
+                reverse: true,
                 child: SizedBox(
-                   width: (days.length * 60).clamp(350, 2000).toDouble(), 
+                  // Dynamic width based on days, but at least full width
+                  width: (days.length * 50).toDouble().clamp(MediaQuery.of(context).size.width - 80, 2000),
                   child: TweenAnimationBuilder<double>(
                     tween: Tween<double>(begin: 0.0, end: 1.0),
-                    duration: Duration(milliseconds: 1500),
-                    curve: Curves.elasticOut, 
+                    duration: const Duration(milliseconds: 1200),
+                    curve: Curves.easeOutQuart,
                     builder: (context, animValue, child) {
-                      final animatedSpots = spots.map((spot) {
-                        return FlSpot(spot.x, spot.y * animValue);
-                      }).toList();
-
+                      final animatedSpots = spots.map((spot) => FlSpot(spot.x, spot.y * animValue)).toList();
                       return LineChart(
                         LineChartData(
                           lineTouchData: LineTouchData(
-                            handleBuiltInTouches: true,
                             touchTooltipData: LineTouchTooltipData(
                               getTooltipColor: (_) => context.colors.primaryOrange,
-                              tooltipPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                                return touchedSpots.map((spot) {
-                                  final rawDate = rawDailyStats.isNotEmpty ? rawDailyStats[spot.x.toInt()]['date'] : "-";
-                                  return LineTooltipItem(
-                                    'Rp ${(spot.y * 10).toStringAsFixed(1)}K\n',
-                                    GoogleFonts.plusJakartaSans(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
+                              getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
+                                final rawDate = rawDailyStats.isNotEmpty ? rawDailyStats[spot.x.toInt()]['date'] : "-";
+                                return LineTooltipItem(
+                                  '${_formatRupiah(spot.y)}\n',
+                                  GoogleFonts.plusJakartaSans(
+                                    color: Colors.white, 
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: _formatFullDate(rawDate), 
+                                      style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.normal)
                                     ),
-                                    children: [
-                                      TextSpan(
-                                        text: _formatFullDate(rawDate),
-                                        style: GoogleFonts.plusJakartaSans(
-                                          color: Colors.white.withValues(alpha: 0.8),
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }).toList();
-                              },
+                                  ],
+                                );
+                              }).toList(),
                             ),
                           ),
-                          gridData: FlGridData(show: false),
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: false,
+                            horizontalInterval: chartMaxY > 0 ? chartMaxY / 4 : 250,
+                            getDrawingHorizontalLine: (value) => FlLine(
+                              color: context.colors.textHint.withOpacity(0.05),
+                              strokeWidth: 1,
+                            ),
+                          ),
                           borderData: FlBorderData(show: false),
                           titlesData: FlTitlesData(
                             show: true,
-                            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                             bottomTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 32,
-                                interval: 1,
+                                interval: 3, 
                                 getTitlesWidget: (value, meta) {
-                                  if (value.toInt() >= 0 && value.toInt() < days.length) {
+                                  final int index = value.toInt();
+                                  if (index >= 0 && index < days.length) {
                                     return Padding(
-                                      padding: EdgeInsets.only(top: 8.0),
+                                      padding: const EdgeInsets.only(top: 12.0),
                                       child: Text(
-                                        days[value.toInt()],
+                                        days[index],
                                         style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                          color: context.colors.textHint,
+                                          fontSize: 10, 
+                                          color: context.colors.textHint, 
+                                          fontWeight: FontWeight.w600
                                         ),
                                       ),
                                     );
                                   }
-                                  return SizedBox.shrink();
+                                  return const SizedBox.shrink();
                                 },
                               ),
                             ),
@@ -234,15 +189,16 @@ class _AnimatedSalesChartState extends State<AnimatedSalesChart> {
                               isCurved: true,
                               curveSmoothness: 0.35,
                               color: context.colors.primaryOrange,
-                              barWidth: 3.5,
+                              barWidth: 4,
                               isStrokeCapRound: true,
                               dotData: FlDotData(
                                 show: true,
                                 getDotPainter: (spot, percent, barData, index) {
+                                  // Only show dots for significant points or at the end
                                   return FlDotCirclePainter(
                                     radius: 4,
                                     color: Colors.white,
-                                    strokeWidth: 2,
+                                    strokeWidth: 3,
                                     strokeColor: context.colors.primaryOrange,
                                   );
                                 },
@@ -253,8 +209,8 @@ class _AnimatedSalesChartState extends State<AnimatedSalesChart> {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    context.colors.primaryOrange.withValues(alpha: 0.4),
-                                    context.colors.primaryOrange.withValues(alpha: 0.0),
+                                    context.colors.primaryOrange.withOpacity(0.2),
+                                    context.colors.primaryOrange.withOpacity(0.0),
                                   ],
                                 ),
                               ),
@@ -263,9 +219,8 @@ class _AnimatedSalesChartState extends State<AnimatedSalesChart> {
                           minX: 0,
                           maxX: (days.length - 1).toDouble().clamp(0, double.infinity),
                           minY: 0,
-                          maxY: chartMaxY, 
+                          maxY: chartMaxY,
                         ),
-                        duration: Duration(milliseconds: 0), 
                       );
                     },
                   ),
@@ -275,6 +230,33 @@ class _AnimatedSalesChartState extends State<AnimatedSalesChart> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, AdminStatsProvider statsProvider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Grafik Penjualan Harian 2026", style: TextStyle(fontSize: 12, color: context.colors.textGrey)),
+            Text(
+              _formatRupiah(statsProvider.stats['total_sales'] ?? 0),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: context.colors.textDark),
+            ),
+          ],
+        ),
+        _buildGrowthBadge(context, statsProvider.stats['sales_growth'] ?? "0%"),
+      ],
+    );
+  }
+
+  Widget _buildGrowthBadge(BuildContext context, String growth) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(color: context.colors.success.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+      child: Text(growth, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.colors.success)),
     );
   }
 }

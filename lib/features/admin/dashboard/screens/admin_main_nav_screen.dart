@@ -61,9 +61,9 @@ class _AdminMainNavScreenState extends State<AdminMainNavScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center, // Memastikan konten rata tengah
             children: [
-              _buildNavItem(0, Icons.dashboard_rounded, "Dashboard"),
+              _buildNavItem(0, Icons.dashboard_rounded, "Dasbor"),
               _buildNavItem(1, Icons.inventory_2_rounded, "Produk"),
-              _buildNavItem(2, Icons.receipt_long_rounded, "Order"),
+              _buildNavItem(2, Icons.receipt_long_rounded, "Pesanan"),
               _buildNavItem(3, Icons.people_alt_rounded, "Pengguna"),
             ],
           ),
