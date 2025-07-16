@@ -28,6 +28,7 @@ class OrderAdminProvider extends ChangeNotifier {
   String? _authToken;
 
   // --- GETTERS ---
+  List<OrderModel> get allOrders => _allOrders;
   OrderLoadState get loadState => _loadState;
   String get errorMessage => _errorMessage;
   int get activeTab => _activeTab;
@@ -208,7 +209,7 @@ class OrderAdminProvider extends ChangeNotifier {
         guestAddress: old.guestAddress,
         total: old.total,
         status: status ?? old.status,
-        pickupTime: pickupTime ?? old.pickupTime, // preserve jika tidak diubah
+        jamAmbil: pickupTime ?? old.jamAmbil, // preserve jika tidak diubah
         createdAt: old.createdAt,
         items: old.items,
       );

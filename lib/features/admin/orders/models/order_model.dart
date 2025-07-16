@@ -1,30 +1,32 @@
 import '../../../../core/network/api_service.dart';
+import '../../../../core/models/order.dart';
 
-// Model yang merepresentasikan satu item dalam pesanan
-class OrderItemModel {
-  final int productId;
+// Model yang merepresentasikan satu item dalam pesanan, mewarisi ItemOrder (OOP)
+class OrderItemModel extends ItemOrder {
   final String productName;
   final String imageUrl; // URL gambar produk dari server
-  final int quantity;
-  final double price;
+  final String category;
 
   OrderItemModel({
-    required this.productId,
+    required super.orderId, // Diwarisi dari ItemOrder
+    required super.produkId, // Diwarisi dari ItemOrder
     required this.productName,
     required this.imageUrl,
-    required this.quantity,
-    required this.price,
+    required this.category,
+    required super.qty, // Diwarisi dari ItemOrder
+    required super.hargaSatuan, // Diwarisi dari ItemOrder
   });
 
+  // Encapsulation: Getters
+  int get productId => produkId;
+  int get quantity => qty;
+  double get price => hargaSatuan;
+
   factory OrderItemModel.fromJson(Map<String, dynamic> json) {
-    // Backend melakukan Preload("Items.Product"), object direturn dengan key "food"
     final product = (json['food'] ?? json['product']) as Map<String, dynamic>?;
-
-    // Ambil nama dari nested product object (bukan top-level)
     final rawName = product?['name'] as String? ?? '';
-
-    // Ambil image_url dari nested product, lalu bangun URL lengkap
     final rawImage = product?['image_url'] as String? ?? '';
+    final rawCategory = product?['category'] as String? ?? 'Lainnya';
     String fullImageUrl = '';
     if (rawImage.isNotEmpty) {
       if (rawImage.startsWith('http')) {
@@ -32,47 +34,48 @@ class OrderItemModel {
       } else if (rawImage.startsWith('/static')) {
         fullImageUrl = '${ApiService.baseDomain}$rawImage';
       } else {
-        // Nama file saja, misal: "roti_coklat.png"
         final cleaned = rawImage.startsWith('/') ? rawImage : '/$rawImage';
         fullImageUrl = '${ApiService.baseDomain}/static$cleaned';
       }
     }
 
     return OrderItemModel(
-      productId: json['product_id'] ?? 0,
+      orderId: json['order_id'] ?? 0,
+      produkId: json['product_id'] ?? 0,
       productName: rawName,
       imageUrl: fullImageUrl,
-      quantity: json['quantity'] ?? 0,
-      price: (json['price'] ?? 0).toDouble(),
+      category: rawCategory,
+      qty: json['quantity'] ?? 0,
+      hargaSatuan: (json['price'] ?? 0).toDouble(),
     );
   }
 }
 
-// Model utama untuk satu pesanan
-class OrderModel {
-  final int id;
+// Model utama untuk satu pesanan, mewarisi Order (OOP)
+class OrderModel extends Order {
   final String orderId;
   final String guestName;
   final String guestPhone;
   final String guestAddress;
-  final double total;
-  final String status;
-  final String? pickupTime; // Jam pengambilan yang ditetapkan admin (nullable)
   final DateTime createdAt;
   final List<OrderItemModel> items;
 
   OrderModel({
-    required this.id,
+    required super.id,
     required this.orderId,
     required this.guestName,
     required this.guestPhone,
     required this.guestAddress,
-    required this.total,
-    required this.status,
-    this.pickupTime,
+    required super.total,
+    required super.status,
+    super.jamAmbil = '', // Map ke jamAmbil di base class
     required this.createdAt,
     required this.items,
-  });
+    String metodeBayar = 'Cash',
+  }) : super(metodeBayar: metodeBayar);
+
+  // Encapsulation: Getter untuk jamAmbil (pickupTime)
+  String? get pickupTime => jamAmbil.isEmpty ? null : jamAmbil;
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     final List<OrderItemModel> parsedItems = [];
@@ -89,26 +92,27 @@ class OrderModel {
       parsedDate = DateTime.now();
     }
 
-    // Gunakan order_ref jika ada (ORD-XYZW), bila backend versi lama gunakan ID fallback
     final rawId = json['id'] ?? 0;
     final formattedOrderId = (json['order_ref'] != null && json['order_ref'].toString().isNotEmpty)
         ? json['order_ref'].toString()
         : 'ROTI515-$rawId';
 
-    // Cek objek user yang dipreload
-    final userMap = json['user'] as Map<String, dynamic>?;
-    
-    final String parsedName = (userMap != null && userMap['name'] != null && userMap['name'].toString().isNotEmpty)
-        ? userMap['name']
-        : (json['guest_name'] != null && json['guest_name'].toString().isNotEmpty ? json['guest_name'] : 'Pelanggan Toko');
-        
-    final String parsedPhone = (userMap != null && userMap['phone'] != null && userMap['phone'].toString().isNotEmpty)
-        ? userMap['phone']
-        : (json['guest_phone'] != null && json['guest_phone'].toString().isNotEmpty ? json['guest_phone'] : '-');
-        
-    final String parsedAddress = (userMap != null && userMap['address'] != null && userMap['address'].toString().isNotEmpty)
-        ? userMap['address']
-        : (json['guest_address'] != null && json['guest_address'].toString().isNotEmpty ? json['guest_address'] : '-');
+    // Backend kirim: pelanggan → user (nested) ATAU user langsung di top level
+    final pelangganMap = json['pelanggan'] as Map<String, dynamic>?;
+    final userMap = json['user'] as Map<String, dynamic>? ??
+        (pelangganMap != null ? pelangganMap['user'] as Map<String, dynamic>? : null);
+
+    final String parsedName = (userMap?['name'] ?? '').toString().isNotEmpty
+        ? userMap!['name'].toString()
+        : (json['guest_name']?.toString().isNotEmpty == true ? json['guest_name'] : 'Pelanggan Toko');
+
+    final String parsedPhone = (pelangganMap?['phone'] ?? userMap?['phone'] ?? '').toString().isNotEmpty
+        ? (pelangganMap?['phone'] ?? userMap?['phone']).toString()
+        : (json['guest_phone']?.toString().isNotEmpty == true ? json['guest_phone'] : '-');
+
+    final String parsedAddress = (userMap?['address'] ?? '').toString().isNotEmpty
+        ? userMap!['address'].toString()
+        : (json['guest_address']?.toString().isNotEmpty == true ? json['guest_address'] : 'Ambil Di Toko');
 
     return OrderModel(
       id: rawId,
@@ -117,27 +121,25 @@ class OrderModel {
       guestPhone: parsedPhone,
       guestAddress: parsedAddress,
       total: (json['total'] ?? 0).toDouble(),
-      status: (json['status'] ?? 'Pending').toLowerCase(),
-      pickupTime: json['pickup_time'] as String?, // nullable dari backend
+      status: (json['status'] ?? 'pending').toLowerCase(),
+      jamAmbil: json['pickup_time'] ?? json['jam_ambil'] ?? '',
       createdAt: parsedDate,
       items: parsedItems,
+      metodeBayar: json['metode_bayar'] ?? json['payment_method'] ?? 'Cash',
     );
   }
 
   // --- HELPER STATUS ---
   bool get isPending => status == 'pending';
   bool get isProcessing => status == 'processing';
-  bool get isCompleted => status == 'completed' || status == 'done';
+  bool get isCompleted => status == 'completed' || status == 'done' || status == 'completed_unconfirmed';
   bool get isCancelled => status == 'cancelled';
 
-  // Apakah jam pengambilan sudah ditetapkan admin
-  bool get hasPickupTime => pickupTime != null && pickupTime!.isNotEmpty;
+  bool get hasPickupTime => jamAmbil.isNotEmpty;
 
-  // Gambar thumbnail: ambil dari item pertama jika ada
   String get thumbnailImage =>
       items.isNotEmpty ? items.first.imageUrl : '';
 
-  // Format waktu relatif
   String get timeAgo {
     final now = DateTime.now();
     final diff = now.difference(createdAt);
@@ -147,11 +149,10 @@ class OrderModel {
     return '${diff.inDays} hari lalu';
   }
 
-  // Format harga ke Rupiah
   String get formattedTotal {
     final totalInt = total.toInt();
     final s = totalInt.toString();
-    final buf = StringBuffer('Rp. ');
+    final buf = StringBuffer('Rp ');
     final mod = s.length % 3;
     buf.write(s.substring(0, mod == 0 ? 3 : mod));
     for (int i = (mod == 0 ? 3 : mod); i < s.length; i += 3) {
