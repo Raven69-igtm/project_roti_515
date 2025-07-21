@@ -101,7 +101,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         ),
       );
 
-      // TODO: Nantinya imageUrl ini akan diganti dengan proses Upload Multipart ke Golang
+      // Kirim data produk dengan file gambar sebagai multipart
       bool success;
       if (widget.initialProduct != null) {
         success = await provider.updateProduct(
@@ -110,8 +110,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           category: _selectedCategory!,
           price: int.parse(_priceController.text),
           stock: int.parse(_stockController.text),
+          description: _descController.text,
           token: token,
-          imageUrl: _imageFile != null ? "/static/${_imageFile!.name}" : null,
+          imageFile: _imageFile, // null = tidak ganti gambar
         );
       } else {
         success = await provider.addProduct(
@@ -119,8 +120,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           category: _selectedCategory!,
           price: int.parse(_priceController.text),
           stock: int.parse(_stockController.text),
+          description: _descController.text,
           token: token,
-          imageUrl: "/static/${_imageFile!.name}",
+          imageFile: _imageFile,
         );
       }
 
@@ -430,14 +432,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   Widget _buildPillDropdown() {
     final List<String> categories = [
-      "Roti Kering",
-      "Roti Basah",
-      "Kue",
-      "Camilan",
+      "Roti",
       "Biskuit",
+      "Snack",
     ];
 
-    // Safety check: jika _selectedCategory tidak ada di daftar, reset ke null atau kategori pertama
+    // Safety check: jika _selectedCategory tidak ada di daftar, reset ke null
     if (_selectedCategory != null && !categories.contains(_selectedCategory)) {
       _selectedCategory = null;
     }
@@ -462,7 +462,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             Icons.keyboard_arrow_down_rounded,
             color: Color(0xFF6B7280),
           ),
-          items: ["Roti Kering", "Roti Basah", "Kue", "Camilan", "Biskuit"].map(
+          items: ["Roti", "Biskuit", "Snack"].map(
             (String value) {
               return DropdownMenuItem<String>(
                 value: value,

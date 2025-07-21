@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -5,9 +6,12 @@ import 'package:provider/provider.dart';
 import '../providers/admin_product_provider.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../../../core/utils/premium_snackbar.dart';
+import '../../../../core/widgets/universal_image.dart';
 //  Import halaman tambah produk
 import 'add_product_screen.dart';
 import '../../profile/screens/admin_profile_screen.dart';
+import '../../dashboard/screens/admin_notification_screen.dart';
+import '../../orders/providers/order_admin_provider.dart';
 import 'package:roti_515/core/theme/theme_provider.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 import 'package:roti_515/core/network/api_service.dart';
@@ -25,10 +29,12 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
   @override
   void initState() {
     super.initState();
+    // Mengambil data produk dari server/API setelah frame pertama dirender
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AdminProductProvider>(context, listen: false).fetchProducts();
     });
 
+    // Mendengarkan perubahan input pencarian produk untuk pencarian realtime
     _searchController.addListener(() {
       Provider.of<AdminProductProvider>(context, listen: false)
           .setSearchQuery(_searchController.text);
@@ -37,6 +43,7 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
 
   @override
   void dispose() {
+    // Membebaskan memori kontroler pencarian saat widget dihancurkan
     _searchController.dispose();
     super.dispose();
   }
@@ -50,14 +57,16 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
       appBar: _buildAppBar(context),
       body: Column(
         children: [
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildSearchBar(context),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
+          _buildCategoryBar(context, provider),
+          const SizedBox(height: 12),
           _buildFilterTabs(context, provider),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Expanded(
             child: _buildBodyContent(context, provider),
           ),
@@ -84,11 +93,14 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
 
   // --- WIDGET HELPERS ---
 
+  // Membangun konten utama body (loading, error, list produk kosong, atau daftar produk)
   Widget _buildBodyContent(BuildContext context, AdminProductProvider provider) {
+    // Tampilan ketika data sedang dimuat dari API
     if (provider.isLoading) {
       return Center(child: CircularProgressIndicator(color: context.colors.primaryOrange));
     }
 
+    // Tampilan ketika terjadi kesalahan saat memuat data (misal koneksi gagal)
     if (provider.errorMessage != null) {
       return Center(
         child: Column(
@@ -108,6 +120,7 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
       );
     }
 
+    // Mengambil daftar produk hasil filter pencarian/kategori dari provider
     final products = provider.filteredProducts;
 
     if (products.isEmpty) {
@@ -134,11 +147,14 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
               ? product["image_url"] 
               : "https://via.placeholder.com/150"; 
           
+          final double rating = (product["rating"] as num?)?.toDouble() ?? 0.0;
+          
           return _buildProductCard(context, 
             name: name,
             price: "Rp $priceStr",
             stock: stock,
             imageUrl: imageUrl,
+            rating: rating,
             onQuickRestock: () => _showQuickRestockDialog(context, product),
             onEdit: () {
               Navigator.push(context,
@@ -162,10 +178,13 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
       automaticallyImplyLeading: false,
       title: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(color: context.colors.primaryOrange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(16)),
-            child: Icon(Icons.bakery_dining_rounded, color: context.colors.primaryOrange, size: 22),
+          Transform.scale(
+            scale: 1.5,
+            child: Image.asset(
+              'assets/images/app_icon-removebg-preview.png',
+              height: 40,
+              fit: BoxFit.contain,
+            ),
           ),
           SizedBox(width: 12),
           Column(
@@ -178,6 +197,71 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
         ],
       ),
       actions: [
+        // Lonceng Notifikasi Admin
+        Center(
+          child: Consumer2<AdminProductProvider, OrderAdminProvider>(
+            builder: (context, prodProvider, orderProvider, _) {
+              final lowStockCount = prodProvider.allProducts.where((p) {
+                final int stock = p['stock'] ?? 0;
+                return stock <= 15;
+              }).length;
+              final pendingCount = orderProvider.pendingCount;
+              final alertCount = lowStockCount + pendingCount;
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminNotificationScreen()),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.colors.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: context.colors.divider),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(
+                        Icons.notifications_none_rounded,
+                        color: alertCount > 0 ? context.colors.primaryOrange : context.colors.textDark,
+                        size: 20,
+                      ),
+                      if (alertCount > 0)
+                        Positioned(
+                          right: -4,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                            child: Text(
+                              "$alertCount",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
         Consumer<ThemeProvider>(
           builder: (context, theme, _) => IconButton(
             icon: Icon(
@@ -200,14 +284,69 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
                 final photoUrl = auth.photoUrl;
                 final fullImageUrl = ApiService.getDisplayImage(photoUrl);
 
-                return CircleAvatar(
-                  backgroundColor: context.colors.primaryOrange.withValues(alpha: 0.1),
-                  backgroundImage: fullImageUrl.isNotEmpty
-                      ? NetworkImage(fullImageUrl)
-                      : null,
-                  child: fullImageUrl.isEmpty
-                      ? Icon(Icons.account_circle_outlined, color: context.colors.primaryOrange)
-                      : null,
+                Widget imageChild;
+                if (fullImageUrl.isEmpty) {
+                  imageChild = Icon(
+                    Icons.account_circle_outlined,
+                    color: context.colors.primaryOrange,
+                    size: 22,
+                  );
+                } else if (fullImageUrl.startsWith('data:image')) {
+                  try {
+                    final base64Str = fullImageUrl.split(',').last;
+                    final decodedBytes = base64Decode(base64Str);
+                    imageChild = Image.memory(
+                      decodedBytes,
+                      fit: BoxFit.cover,
+                      width: 36,
+                      height: 36,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.account_circle_outlined,
+                        color: context.colors.primaryOrange,
+                        size: 22,
+                      ),
+                    );
+                  } catch (_) {
+                    imageChild = Icon(
+                      Icons.account_circle_outlined,
+                      color: context.colors.primaryOrange,
+                      size: 22,
+                    );
+                  }
+                } else {
+                  imageChild = Image.network(
+                    fullImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.account_circle_outlined,
+                      color: context.colors.primaryOrange,
+                      size: 22,
+                    ),
+                    loadingBuilder: (_, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: context.colors.primaryOrange,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+
+                return Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: context.colors.primaryOrange.withValues(alpha: 0.1),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: imageChild,
                 );
               },
             ),
@@ -236,6 +375,59 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(vertical: 14),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryBar(BuildContext context, AdminProductProvider provider) {
+    final List<String> categories = ["Semua", "Roti", "Biskuit", "Snack"];
+
+    return SizedBox(
+      height: 40,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final name = categories[index];
+          final String categoryValue = (name == "Semua") ? "All" : name;
+          final isSelected = provider.selectedCategory.toLowerCase() == categoryValue.toLowerCase();
+
+          return GestureDetector(
+            onTap: () => provider.setCategory(categoryValue),
+            child: Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: isSelected ? context.colors.primaryOrange : context.colors.white,
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(
+                  color: isSelected
+                      ? context.colors.primaryOrange
+                      : context.colors.divider,
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: context.colors.primaryOrange.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        )
+                      ]
+                    : null,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                name,
+                style: GoogleFonts.plusJakartaSans(
+                  color: isSelected ? Colors.white : context.colors.textGrey,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -275,10 +467,12 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
     );
   }
 
+  // Widget kartu produk untuk menampilkan informasi nama, harga, stok, rating, dan aksi edit/hapus/restock
   Widget _buildProductCard(BuildContext context, {
-    required String name, required String price, required int stock, required String imageUrl,
+    required String name, required String price, required int stock, required String imageUrl, required double rating,
     required VoidCallback onEdit, required VoidCallback onDelete, VoidCallback? onQuickRestock,
   }) {
+    // Menentukan warna background & teks berdasarkan sisa stok produk (habis, tipis, atau aman)
     Color stockBgColor = stock == 0 ? Color(0xFFFEE2E2) : stock <= 15 ? Color(0xFFFFEDD5) : Color(0xFFDCFCE7);
     Color stockTextColor = stock == 0 ? Color(0xFFB91C1C) : stock <= 15 ? Color(0xFFC2410C) : Color(0xFF15803D);
 
@@ -294,8 +488,8 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              imageUrl, width: 80, height: 80, fit: BoxFit.cover,
+            child: UniversalImage(
+              imageUrl: imageUrl, width: 80, height: 80, fit: BoxFit.cover,
               errorBuilder: (context, error, stack) => Container(
                 width: 80, height: 80, color: context.colors.divider, 
                 child: Icon(Icons.image_not_supported_rounded, color: context.colors.textGrey)
@@ -337,6 +531,14 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
                         ),
                       ],
                     ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                        SizedBox(width: 4),
+                        Text(rating.toStringAsFixed(1), style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: context.colors.textDark)),
+                      ],
+                    ),
                   ],
                 ),
               ],
@@ -369,6 +571,7 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
     );
   }
 
+  // Menampilkan dialog konfirmasi untuk menghapus produk dari backend
   void _confirmDelete(BuildContext context, Map<String, dynamic> product) {
     showDialog(
       context: context,
@@ -388,6 +591,7 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
               final auth = Provider.of<AuthProvider>(context, listen: false);
               final token = auth.token ?? '';
               
+              // Memanggil API hapus produk di backend melalui provider
               bool success = await provider.deleteProduct(product['id'], token);
               if (mounted) {
                 if (success) {
@@ -404,6 +608,7 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
     );
   }
 
+  // Dialog cepat untuk menambahkan jumlah stok produk dan memperbaruinya ke API
   void _showQuickRestockDialog(BuildContext context, Map<String, dynamic> product) {
     final TextEditingController stockController = TextEditingController();
 
@@ -434,7 +639,7 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, ctx),
+            onPressed: () => Navigator.pop(ctx),
             child: Text("Batal", style: GoogleFonts.plusJakartaSans(color: context.colors.textGrey)),
           ),
           ElevatedButton(
@@ -445,11 +650,12 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
                 return;
               }
 
-              Navigator.pop(context, ctx);
+              Navigator.pop(ctx);
               final provider = Provider.of<AdminProductProvider>(context, listen: false);
               final auth = Provider.of<AuthProvider>(context, listen: false);
               final int newStock = (product['stock'] ?? 0) + addedStock;
 
+              // Memperbarui stok produk ke database backend menggunakan method updateProduct
               bool success = await provider.updateProduct(
                 id: product['id'],
                 name: product['name'],
@@ -457,10 +663,9 @@ class _ProductAdminScreenState extends State<ProductAdminScreen> {
                 price: product['price'],
                 stock: newStock,
                 token: auth.token ?? '',
-                imageUrl: product['image_url'],
               );
 
-              if (mounted) {
+              if (context.mounted) {
                 if (success) {
                   PremiumSnackbar.showSuccess(context, "Stok berhasil ditambahkan");
                 } else {
