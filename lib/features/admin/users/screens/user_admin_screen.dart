@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,9 @@ import '../../../auth/providers/auth_provider.dart';
 import '../../../auth/models/user_model.dart';
 import '../providers/user_admin_provider.dart';
 import '../../profile/screens/admin_profile_screen.dart';
+import '../../product_admin/providers/admin_product_provider.dart';
+import '../../dashboard/screens/admin_notification_screen.dart';
+import '../../orders/providers/order_admin_provider.dart';
 import 'package:roti_515/core/theme/theme_provider.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 import 'package:roti_515/core/network/api_service.dart';
@@ -24,6 +28,7 @@ class _UserAdminScreenState extends State<UserAdminScreen> {
   @override
   void initState() {
     super.initState();
+    // Mengambil token autentikasi dan memicu pemanggilan API data pengguna di provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final token = context.read<AuthProvider>().token;
@@ -31,6 +36,7 @@ class _UserAdminScreenState extends State<UserAdminScreen> {
       }
     });
 
+    // Mendengarkan perubahan ketikan input pencarian nama/email secara realtime
     _searchController.addListener(() {
       if (mounted) {
         context.read<UserAdminProvider>().setSearchQuery(_searchController.text);
@@ -40,6 +46,7 @@ class _UserAdminScreenState extends State<UserAdminScreen> {
 
   @override
   void dispose() {
+    // Menghapus search controller untuk menghindari kebocoran memori
     _searchController.dispose();
     super.dispose();
   }
@@ -145,13 +152,13 @@ class _UserAdminScreenState extends State<UserAdminScreen> {
       automaticallyImplyLeading: false,
       title: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: context.colors.primaryOrange.withValues(alpha: 0.1), 
-              borderRadius: BorderRadius.circular(16)
+          Transform.scale(
+            scale: 1.5,
+            child: Image.asset(
+              'assets/images/app_icon-removebg-preview.png',
+              height: 40,
+              fit: BoxFit.contain,
             ),
-            child: Icon(Icons.bakery_dining_rounded, color: context.colors.primaryOrange, size: 22),
           ),
           SizedBox(width: 12),
           Column(
@@ -164,6 +171,71 @@ class _UserAdminScreenState extends State<UserAdminScreen> {
         ],
       ),
       actions: [
+        // Lonceng Notifikasi Admin
+        Center(
+          child: Consumer2<AdminProductProvider, OrderAdminProvider>(
+            builder: (context, prodProvider, orderProvider, _) {
+              final lowStockCount = prodProvider.allProducts.where((p) {
+                final int stock = p['stock'] ?? 0;
+                return stock <= 15;
+              }).length;
+              final pendingCount = orderProvider.pendingCount;
+              final alertCount = lowStockCount + pendingCount;
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminNotificationScreen()),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.colors.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: context.colors.divider),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(
+                        Icons.notifications_none_rounded,
+                        color: alertCount > 0 ? context.colors.primaryOrange : context.colors.textDark,
+                        size: 20,
+                      ),
+                      if (alertCount > 0)
+                        Positioned(
+                          right: -4,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                            child: Text(
+                              "$alertCount",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
         Consumer<ThemeProvider>(
           builder: (context, theme, _) => IconButton(
             icon: Icon(
@@ -186,14 +258,69 @@ class _UserAdminScreenState extends State<UserAdminScreen> {
                 final photoUrl = auth.photoUrl;
                 final fullImageUrl = ApiService.getDisplayImage(photoUrl);
 
-                return CircleAvatar(
-                  backgroundColor: context.colors.primaryOrange.withValues(alpha: 0.1),
-                  backgroundImage: fullImageUrl.isNotEmpty
-                      ? NetworkImage(fullImageUrl)
-                      : null,
-                  child: fullImageUrl.isEmpty
-                      ? Icon(Icons.account_circle_outlined, color: context.colors.primaryOrange)
-                      : null,
+                Widget imageChild;
+                if (fullImageUrl.isEmpty) {
+                  imageChild = Icon(
+                    Icons.account_circle_outlined,
+                    color: context.colors.primaryOrange,
+                    size: 22,
+                  );
+                } else if (fullImageUrl.startsWith('data:image')) {
+                  try {
+                    final base64Str = fullImageUrl.split(',').last;
+                    final decodedBytes = base64Decode(base64Str);
+                    imageChild = Image.memory(
+                      decodedBytes,
+                      fit: BoxFit.cover,
+                      width: 36,
+                      height: 36,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.account_circle_outlined,
+                        color: context.colors.primaryOrange,
+                        size: 22,
+                      ),
+                    );
+                  } catch (_) {
+                    imageChild = Icon(
+                      Icons.account_circle_outlined,
+                      color: context.colors.primaryOrange,
+                      size: 22,
+                    );
+                  }
+                } else {
+                  imageChild = Image.network(
+                    fullImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.account_circle_outlined,
+                      color: context.colors.primaryOrange,
+                      size: 22,
+                    ),
+                    loadingBuilder: (_, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: context.colors.primaryOrange,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+
+                return Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: context.colors.primaryOrange.withValues(alpha: 0.1),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: imageChild,
                 );
               },
             ),
@@ -207,11 +334,13 @@ class _UserAdminScreenState extends State<UserAdminScreen> {
 // ============================================================
 // TAB BAR: Semua | Admin | Pelanggan
 // ============================================================
+// Widget Tab Bar untuk memfilter tipe pengguna (Semua, Admin, Pelanggan)
 class _UserTabBar extends StatelessWidget {
   const _UserTabBar();
 
   @override
   Widget build(BuildContext context) {
+    // Memantau perubahan state filter tab aktif di provider
     final provider = context.watch<UserAdminProvider>();
 
     return Container(
@@ -277,8 +406,9 @@ class _UserTabBar extends StatelessWidget {
 }
 
 // ============================================================
-// CONTENT LIST PENGGUNA
+// KONTEN LIST PENGGUNA
 // ============================================================
+// Widget untuk merender list pengguna sesuai dengan state (loading, error, kosong, sukses)
 class _UserListContent extends StatelessWidget {
   const _UserListContent();
 
@@ -286,6 +416,7 @@ class _UserListContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<UserAdminProvider>();
 
+    // Menampilkan indikator loading saat memanggil API get users
     if (provider.loadState == UserLoadState.loading) {
       return Center(
         child: CircularProgressIndicator(color: context.colors.primaryOrange),
@@ -383,12 +514,14 @@ class _UserListContent extends StatelessWidget {
 // ============================================================
 // KOMPONEN ITEM PENGGUNA (Sesuai Desain HTML)
 // ============================================================
+// Widget kartu info detail user (Avatar, Nama, Email, Badge Role, Waktu Join)
 class _UserListItem extends StatelessWidget {
   final UserModel user;
   const _UserListItem({required this.user});
 
   @override
   Widget build(BuildContext context) {
+    // Menentukan role pengguna (Admin atau Pelanggan biasa) untuk styling badge & status
     final bool isAdmin = user.role.toLowerCase() == 'admin';
     // Gunakan indikator hijau jika admin (aktif) atau pengguna baru? Kita asumsikan hijau untuk pengguna baru/admin, abu-abu kalau lama
     // Atau kita bisa gunakan hijau untuk admin, abu abu untuk pelanggan. (Sesuai desain)
@@ -423,7 +556,7 @@ class _UserListItem extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                    user.nama.isNotEmpty ? user.nama[0].toUpperCase() : '?',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -455,7 +588,7 @@ class _UserListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user.name.isEmpty ? 'Pengguna Tidak Diketahui' : user.name,
+                  user.nama.isEmpty ? 'Pengguna Tidak Diketahui' : user.nama,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:http_parser/http_parser.dart';
 
 import '../../../../core/network/api_service.dart';
 import '../../../auth/providers/auth_provider.dart';
@@ -13,7 +11,6 @@ import '../../../profile/widgets/profile_section_label.dart';
 import '../../../profile/widgets/profile_menu_tile.dart';
 import '../../../profile/widgets/profile_logout_button.dart';
 import '../../../../presentation/pages/profile/edit_profile_page.dart';
-import '../../../../core/utils/premium_snackbar.dart';
 import 'package:roti_515/core/theme/theme_provider.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 
@@ -32,9 +29,11 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   @override
   void initState() {
     super.initState();
+    // Memulai pemanggilan data profil admin dari server/API
     _fetchProfile();
   }
 
+  // Fungsi mengambil profil admin dari backend menggunakan HTTP GET dan token otentikasi
   Future<void> _fetchProfile() async {
     try {
       final token = Provider.of<AuthProvider>(context, listen: false).token;
@@ -50,8 +49,20 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
         final data = jsonDecode(response.body);
         if (mounted) {
           final user = data['user'];
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
           // Update global photoUrl di AuthProvider agar AppBar sinkron
-          Provider.of<AuthProvider>(context, listen: false).updatePhotoUrl(user['photo_url']);
+          authProvider.updatePhotoUrl(user['photo_url']);
+
+          // Inject data lokal (address/name/phone) karena API mungkin tidak menyimpannya
+          if (authProvider.address != null && authProvider.address!.isNotEmpty) {
+            user['address'] = authProvider.address;
+          }
+          if (authProvider.name != null && authProvider.name!.isNotEmpty) {
+            user['name'] = authProvider.name;
+          }
+          if (authProvider.phone != null && authProvider.phone!.isNotEmpty) {
+            user['phone'] = authProvider.phone;
+          }
 
           setState(() {
             _userData = user;
@@ -67,57 +78,10 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     }
   }
 
-  Future<void> _pickAndUploadImage() async {
-    final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 90,
-    );
-
-    if (image == null) return;
-    if (!mounted) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final token = Provider.of<AuthProvider>(context, listen: false).token;
-      var request = http.MultipartRequest('POST', Uri.parse(ApiService.uploadPhoto));
-      request.headers['Authorization'] = 'Bearer $token';
-
-      // Gunakan file langsung dari picker
-      final bytes = await image.readAsBytes();
-      request.files.add(http.MultipartFile.fromBytes(
-        'photo',
-        bytes,
-        filename: 'admin_photo.jpg',
-        contentType: MediaType('image', 'jpeg'),
-      ));
-
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
-        if (mounted) {
-          PremiumSnackbar.showSuccess(context, "Foto profil berhasil diperbarui!");
-          _fetchProfile();
-        }
-      } else {
-        if (mounted) {
-          final data = jsonDecode(response.body);
-          PremiumSnackbar.showError(context, data['error'] ?? "Gagal mengunggah foto");
-          setState(() => _isLoading = false);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        PremiumSnackbar.showError(context, "Terjadi kesalahan: $e");
-        setState(() => _isLoading = false);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    // Menyiapkan nama lengkap dan email admin
     String fullName = _userData?['name'] ?? "Loading...";
     String email = _userData?['email'] ?? "memuat..";
 
@@ -161,7 +125,6 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                     name: fullName, 
                     email: email,
                     photoUrl: _userData?['photo_url'],
-                    onCameraTap: _pickAndUploadImage,
                   ),
                   SizedBox(height: 24),
                   ProfileSectionLabel(label: "Aktivitas Akun"),
