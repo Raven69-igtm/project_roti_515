@@ -20,9 +20,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     with SingleTickerProviderStateMixin {
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
   bool _isLoading = false;
 
   late AnimationController _animCtrl;
@@ -46,19 +44,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   @override
   void dispose() {
     _animCtrl.dispose();
-    _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     super.dispose();
   }
 
   Future<void> _verifyIdentity() async {
-    final name = _nameController.text.trim();
     final email = _emailController.text.trim();
-    final phone = _phoneController.text.trim();
 
-    if (name.isEmpty || email.isEmpty || phone.isEmpty) {
-      PremiumSnackbar.showError(context, "Semua field wajib diisi");
+    if (email.isEmpty) {
+      PremiumSnackbar.showError(context, "Email wajib diisi");
       return;
     }
 
@@ -69,9 +63,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         Uri.parse(ApiService.forgotPassword),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "name": name,
           "email": email,
-          "phone": phone,
         }),
       ).timeout(const Duration(seconds: 10));
 
@@ -155,7 +147,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      "Masukkan data yang terdaftar untuk\nmereset password akun Anda.",
+                      "Masukkan email yang terdaftar untuk\nmereset password akun Anda.",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 14,
@@ -186,7 +178,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            "Pastikan data yang Anda masukkan sesuai dengan yang terdaftar saat mendaftar.",
+                            "Pastikan email yang Anda masukkan sesuai dengan email yang terdaftar.",
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               color: context.colors.primaryOrange,
@@ -201,28 +193,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
 
                   // Form Fields
                   LoginInputField(
-                    controller: _nameController,
-                    label: "Nama Lengkap",
-                    hint: "Masukkan nama sesuai pendaftaran",
-                    icon: Icons.person_outline_rounded,
-                  ),
-                  const SizedBox(height: 20),
-
-                  LoginInputField(
                     controller: _emailController,
                     label: "Email",
                     hint: "Masukkan email terdaftar",
                     icon: Icons.mail_outline_rounded,
                     keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 20),
-
-                  LoginInputField(
-                    controller: _phoneController,
-                    label: "No. Handphone",
-                    hint: "Masukkan nomor HP terdaftar",
-                    icon: Icons.phone_android_outlined,
-                    keyboardType: TextInputType.phone,
                   ),
                   const SizedBox(height: 36),
 

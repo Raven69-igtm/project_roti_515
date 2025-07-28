@@ -1,16 +1,16 @@
 import 'dart:convert'; // Untuk melakukan encoding/decoding JSON saat mengirim data ke API
 import 'package:flutter/material.dart'; // Library utama Flutter untuk membangun antarmuka pengguna (UI)
-import 'package:http/http.dart' as http; // Digunakan untuk melakukan HTTP request (GET, POST, dll) ke backend
+import 'package:http/http.dart'
+    as http; // Digunakan untuk melakukan HTTP request (GET, POST, dll) ke backend
 
 import 'package:google_fonts/google_fonts.dart'; // Library untuk menggunakan font Google secara langsung
 
-// Mengimpor konstanta warna yang digunakan dalam aplikasi
+// Mengimpor utilitas PremiumSnackbar untuk menampilkan pesan notifikasi/error
 import '../../../core/utils/premium_snackbar.dart';
 // Mengimpor daftar rute untuk navigasi antar halaman
 import '../../../routes/app_routes.dart';
 // Mengimpor file ApiService yang menyimpan alamat endpoint backend
 import '../../../core/network/api_service.dart';
-
 
 // Mengimpor komponen-komponen UI modular khusus untuk halaman login
 import '../widgets/login_logo.dart';
@@ -31,7 +31,6 @@ class LoginScreen extends StatefulWidget {
 // State dari LoginScreen, menggunakan SingleTickerProviderStateMixin agar bisa menggunakan kontroler animasi seperti TabController
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-      
   // Controller untuk menangkap dan membaca teks yang diketik di kolom input Email
   final TextEditingController _emailController = TextEditingController();
   // Controller untuk menangkap teks di kolom input Password
@@ -78,14 +77,19 @@ class _LoginScreenState extends State<LoginScreen>
 
     try {
       // Mengirimkan permintaan HTTP POST ke backend
-      final response = await http.post(
-        Uri.parse(_apiUrl), // URL API dari konfigurasi network
-        headers: {"Content-Type": "application/json"}, // Tipe konten berupa JSON
-        body: jsonEncode({
-          "email": _emailController.text.trim(), // Data email, hapus spasi berlebih
-          "password": _passwordController.text, // Data password
-        }),
-      ).timeout(Duration(seconds: 10)); // Diberi batas waktu 10 detik
+      final response = await http
+          .post(
+            Uri.parse(_apiUrl), // URL API dari konfigurasi network
+            headers: {
+              "Content-Type": "application/json",
+            }, // Tipe konten berupa JSON
+            body: jsonEncode({
+              "email": _emailController.text
+                  .trim(), // Data email, hapus spasi berlebih
+              "password": _passwordController.text, // Data password
+            }),
+          )
+          .timeout(Duration(seconds: 10)); // Diberi batas waktu 10 detik
 
       // Mengurai string JSON dari server menjadi objek (Map) Dart
       final data = jsonDecode(response.body);
@@ -98,17 +102,33 @@ class _LoginScreenState extends State<LoginScreen>
         final String userName = data['user']['name'];
         final String? photoUrl = data['user']['photo_url'];
 
+        // Validasi kesesuaian tab dengan role dari database
+        if (_tabController.index == 1 && userRole != 'admin') {
+          PremiumSnackbar.showError(
+            context,
+            "Akun Pelanggan tidak bisa login di tab Admin",
+          );
+          return;
+        }
+        if (_tabController.index == 0 && userRole == 'admin') {
+          PremiumSnackbar.showError(
+            context,
+            "Akun Admin silakan login melalui tab Admin",
+          );
+          return;
+        }
+
         // Langsung pindah ke layar sukses dan bawa data auth-nya
         Navigator.pushReplacementNamed(
-          context, 
-          AppRoutes.loginSuccess, 
+          context,
+          AppRoutes.loginSuccess,
           arguments: {
             'token': token,
             'role': userRole,
             'name': userName,
             'photoUrl': photoUrl,
-            'isAdmin': userRole == 'admin'
-          }
+            'isAdmin': userRole == 'admin',
+          },
         );
       } else if (mounted) {
         // Tampilkan pesan error jika status code bukan 200 (misalnya salah password)
@@ -117,7 +137,10 @@ class _LoginScreenState extends State<LoginScreen>
     } catch (e) {
       // Cek apakah terjadi error lainnya (misal error koneksi internet)
       if (mounted) {
-        PremiumSnackbar.showError(context, "Gagal terhubung ke server. Cek koneksi.");
+        PremiumSnackbar.showError(
+          context,
+          "Gagal terhubung ke server. Cek koneksi.",
+        );
       }
     } finally {
       // Pastikan status loading dikembalikan ke false di akhir try/catch
@@ -130,21 +153,26 @@ class _LoginScreenState extends State<LoginScreen>
     // Scaffold merepresentasikan kerangka layar dasar dari desain material Flutter
     return Scaffold(
       backgroundColor: context.colors.authBackground, // Set warna latar layar
-      body: SafeArea( // SafeArea menjaga agar widget tidak tertutup oleh poni/status bar layar HP
-        child: SingleChildScrollView( // Agar seluruh isi halaman bisa di-scroll ke bawah saat keyboard muncul
-          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0), // Jarak di kanan kiri
-          child: Column( // Menata semua widget secara berurut ke bawah (vertikal)
+      body: SafeArea(
+        // SafeArea menjaga agar widget tidak tertutup oleh poni/status bar layar HP
+        child: SingleChildScrollView(
+          // Agar seluruh isi halaman bisa di-scroll ke bawah saat keyboard muncul
+          padding: EdgeInsets.symmetric(
+            horizontal: 24.0,
+            vertical: 16.0,
+          ), // Jarak di kanan kiri
+          child: Column(
+            // Menata semua widget secara berurut ke bawah (vertikal)
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
               // Widget Kustom Logo Login Aplikasi
               LoginLogo(),
               SizedBox(height: 32),
-              
+
               // Menampilkan Pilihan Tab (User / Admin)
               LoginTabSelector(controller: _tabController),
               SizedBox(height: 32),
-              
+
               // Widget kustom Input TextField untuk Email
               LoginInputField(
                 controller: _emailController,
@@ -153,16 +181,19 @@ class _LoginScreenState extends State<LoginScreen>
                 icon: Icons.mail_outline_rounded,
               ),
               SizedBox(height: 20),
-              
+
               // Widget kustom Input TextField untuk Kata Sandi (Password)
               LoginInputField(
                 controller: _passwordController,
                 label: "Password",
                 hint: "Masukkan Password",
                 icon: Icons.lock_outline_rounded,
-                isPassword: true, // Menandakan bahwa textfield ini bertindak sebagai tempat password (termasuk menutupi teks)
+                isPassword:
+                    true, // Menandakan bahwa textfield ini bertindak sebagai tempat password (termasuk menutupi teks)
                 obscureText: _isObscure, // Status bool teks terlihat/sembunyi
-                onSuffixTap: () => setState(() => _isObscure = !_isObscure), // SetState membalikkan visibilitas
+                onSuffixTap: () => setState(
+                  () => _isObscure = !_isObscure,
+                ), // SetState membalikkan visibilitas
               ),
 
               // Bagian Lupa Password yang diletakkan rata kanan (centerRight)
@@ -170,7 +201,8 @@ class _LoginScreenState extends State<LoginScreen>
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () => Navigator.pushNamed(context, AppRoutes.forgotPassword),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, AppRoutes.forgotPassword),
                     child: Text(
                       "Lupa Password?",
                       style: GoogleFonts.plusJakartaSans(
@@ -188,10 +220,11 @@ class _LoginScreenState extends State<LoginScreen>
               SizedBox(height: 32),
 
               // Widget tulisan "Belum punya akun? Daftar" - Hanya tampil di tab User
-              if (_tabController.index == 0)
-                LoginFooter(),
-              
-              const SizedBox(height: 40), // Jarak terluar agar isi tidak mepet di akhir guliran layar
+              if (_tabController.index == 0) LoginFooter(),
+
+              const SizedBox(
+                height: 40,
+              ), // Jarak terluar agar isi tidak mepet di akhir guliran layar
             ],
           ),
         ),

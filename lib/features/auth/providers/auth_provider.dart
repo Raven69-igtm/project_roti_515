@@ -9,12 +9,16 @@ class AuthProvider extends ChangeNotifier {
   String? _role;
   String? _name;
   String? _photoUrl;
+  String? _address; // Tambahan lokal untuk address
+  String? _phone;   // Tambahan lokal untuk phone
 
   // Getter: Cara aman untuk mengakses data autentikasi dari luar kelas
   String? get token => _token;
   String? get role => _role;
   String? get name => _name;
   String? get photoUrl => _photoUrl;
+  String? get address => _address;
+  String? get phone => _phone;
 
   // Fungsi helper: Mengecek status apakah user sudah login atau bertindak sebagai admin
   bool get isLoggedIn => _token != null;
@@ -26,6 +30,8 @@ class AuthProvider extends ChangeNotifier {
   static final String _keyRole = "user_role";
   static final String _keyName = "user_name";
   static final String _keyPhotoUrl = "user_photo_url";
+  static final String _keyAddress = "user_address";
+  static final String _keyPhone = "user_phone";
 
   /// MEMUAT SESI (Fungsi Auto-Login):
   /// Dipanggil saat aplikasi pertama kali dibuka untuk mengecek data login lama.
@@ -36,6 +42,8 @@ class AuthProvider extends ChangeNotifier {
     _role = prefs.getString(_keyRole);
     _name = prefs.getString(_keyName);
     _photoUrl = prefs.getString(_keyPhotoUrl);
+    _address = prefs.getString(_keyAddress);
+    _phone = prefs.getString(_keyPhone);
     
     // Memberitahu UI (Listener) bahwa data sesi sudah siap digunakan
     notifyListeners();
@@ -50,6 +58,25 @@ class AuthProvider extends ChangeNotifier {
       await prefs.setString(_keyPhotoUrl, url);
     } else {
       await prefs.remove(_keyPhotoUrl);
+    }
+    notifyListeners();
+  }
+
+  /// UPDATE PROFILE LOKAL:
+  /// Menyimpan nama, phone, dan alamat secara lokal karena API mungkin tidak menyimpannya.
+  Future<void> updateProfileData({String? name, String? phone, String? address}) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (name != null && name.isNotEmpty) {
+      _name = name;
+      await prefs.setString(_keyName, name);
+    }
+    if (phone != null && phone.isNotEmpty) {
+      _phone = phone;
+      await prefs.setString(_keyPhone, phone);
+    }
+    if (address != null && address.isNotEmpty) {
+      _address = address;
+      await prefs.setString(_keyAddress, address);
     }
     notifyListeners();
   }
@@ -86,6 +113,8 @@ class AuthProvider extends ChangeNotifier {
     await prefs.remove(_keyRole);
     await prefs.remove(_keyName);
     await prefs.remove(_keyPhotoUrl);
+    await prefs.remove(_keyAddress);
+    await prefs.remove(_keyPhone);
 
     // Mengembalikan status aplikasi ke kondisi 'Belum Login'
     notifyListeners();
