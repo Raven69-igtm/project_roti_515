@@ -89,7 +89,24 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen>
     _textCtrl.forward(); // Jalankan animasi teks
     await Future.delayed(Duration(milliseconds: 300));
     if (!mounted) return;
-    _btnCtrl.forward(); // Jalankan animasi tombol
+    _btnCtrl.forward(); // Jalankan animasi teks bawah
+
+    // Auto-redirect ke beranda setelah 2 detik
+    await Future.delayed(Duration(seconds: 2));
+    if (!mounted) return;
+
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      await Provider.of<AuthProvider>(context, listen: false).login(
+        args['token'],
+        role: args['role'],
+        name: args['name'],
+        photoUrl: args['photoUrl'],
+      );
+    }
+
+    if (!context.mounted) return;
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
   }
 
   @override
@@ -113,71 +130,88 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen>
           ),
 
           SafeArea(
-            child: Column(
-              children: [
-                Spacer(flex: 2),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                children: [
+                  Spacer(flex: 2),
 
-                // WIDGET IKON SUKSES (Dibatasi Animasi Transisi)
-                ScaleTransition(
-                  scale: _circleScale,
-                  child: FadeTransition(
-                    opacity: _circleFade,
-                    child: _SuccessIcon(),
-                  ),
-                ),
-
-                SizedBox(height: 32),
-
-                // WIDGET INFORMASI TEKS (AnimatedBuilder untuk efek Slide)
-                AnimatedBuilder(
-                  animation: _textCtrl,
-                  builder: (_, child) => Transform.translate(
-                    offset: Offset(0, _textSlide.value),
+                  // WIDGET IKON SUKSES (Dibatasi Animasi Transisi)
+                  ScaleTransition(
+                    scale: _circleScale,
                     child: FadeTransition(
-                      opacity: _textFade,
-                      child: child,
+                      opacity: _circleFade,
+                      child: _SuccessIcon(),
                     ),
                   ),
-                  child: _LoginInfo(),
-                ),
 
-                Spacer(flex: 3),
+                  SizedBox(height: 32),
 
-                // WIDGET TOMBOL AKSI (Navigasi Berdasarkan Role)
-                AnimatedBuilder(
-                  animation: _btnCtrl,
-                  builder: (_, child) => Transform.translate(
-                    offset: Offset(0, _btnSlide.value),
-                    child: FadeTransition(
-                      opacity: _btnFade,
-                      child: child,
+                  // WIDGET INFORMASI TEKS (AnimatedBuilder untuk efek Slide)
+                  AnimatedBuilder(
+                    animation: _textCtrl,
+                    builder: (_, child) => Transform.translate(
+                      offset: Offset(0, _textSlide.value),
+                      child: FadeTransition(
+                        opacity: _textFade,
+                        child: child,
+                      ),
+                    ),
+                    child: _LoginInfo(),
+                  ),
+
+                  Spacer(flex: 3),
+
+                  // WIDGET TEKS REDIRECT OTOMATIS
+                  AnimatedBuilder(
+                    animation: _btnCtrl,
+                    builder: (_, child) => Transform.translate(
+                      offset: Offset(0, _btnSlide.value),
+                      child: FadeTransition(
+                        opacity: _btnFade,
+                        child: child,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 40),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: context.colors.primaryOrange,
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            'Mengalihkan ke beranda...',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: context.colors.textHint,
+                              height: 20 / 14,
+                            ),
+                          ),
+                          SizedBox(height: 24),
+                          Text(
+                            'roti515',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: context.colors.textHint,
+                              height: 20 / 14,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: _BottomActions(
-                    onNext: () async {
-                      // Mengambil argumen data auth dari rute sebelumnya
-                      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-                      if (args != null) {
-                        // Tunggu proses login (simpan sesi) selesai
-                        await Provider.of<AuthProvider>(context, listen: false).login(
-                          args['token'],
-                          role: args['role'],
-                          name: args['name'],
-                          photoUrl: args['photoUrl'],
-                        );
-                      }
-                      
-                      if (!context.mounted) return;
 
-                      // Bersihkan stack dan kembali ke rute utama ('/')
-                      // main.dart akan otomatis menentukan apakah ke Home atau Admin Dashboard
-                      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-                    },
-                  ),
-                ),
-
-                SizedBox(height: 32),
-              ],
+                  SizedBox(height: 32),
+                ],
+              ),
             ),
           ),
         ],
@@ -283,98 +317,4 @@ class _LoginInfo extends StatelessWidget {
   }
 }
 
-/// BOTTOM ACTIONS: Berisi tombol interaktif dengan efek animasi saat ditekan.
-class _BottomActions extends StatefulWidget {
-  final VoidCallback onNext;
-  const _BottomActions({required this.onNext});
 
-  @override
-  State<_BottomActions> createState() => _BottomActionsState();
-}
-
-class _BottomActionsState extends State<_BottomActions>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pressCtrl;
-  late final Animation<double> _pressScale;
-
-  @override
-  void initState() {
-    super.initState();
-    _pressCtrl = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 100),
-      reverseDuration: Duration(milliseconds: 150),
-    );
-    _pressScale = Tween<double>(begin: 1.0, end: 0.96)
-        .chain(CurveTween(curve: Curves.easeInOut))
-        .animate(_pressCtrl);
-  }
-
-  @override
-  void dispose() {
-    _pressCtrl.dispose();
-    super.dispose();
-  }
-
-  /// HANDLE PRESS: Memberikan efek membal pada tombol sebelum lanjut ke halaman berikutnya.
-  Future<void> _handlePress() async {
-    await _pressCtrl.forward();
-    await _pressCtrl.reverse();
-    widget.onNext();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: _handlePress,
-            child: ScaleTransition(
-              scale: _pressScale,
-              child: Container(
-                height: 56,
-                decoration: BoxDecoration(
-                  color: context.colors.primaryOrange,
-                  borderRadius: BorderRadius.circular(9999),
-                  boxShadow: [
-                    BoxShadow(
-                      color: context.colors.primaryOrange.withValues(alpha: 0.30),
-                      blurRadius: 16,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    'Lanjutkan ke Beranda',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: context.colors.white,
-                      letterSpacing: 0.4,
-                      height: 24 / 16,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(height: 24),
-
-          Text(
-            'roti515',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: context.colors.textHint,
-              height: 20 / 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
