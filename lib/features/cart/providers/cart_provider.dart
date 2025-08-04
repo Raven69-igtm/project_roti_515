@@ -35,11 +35,15 @@ class CartProvider extends ChangeNotifier {
     final existingIndex = _items.indexWhere((item) => item.product.id == product.id);
 
     if (existingIndex >= 0) {
-      // Kalau sudah ada, tambah quantity-nya saja
-      _items[existingIndex].quantity++;
+      // Kalau sudah ada, tambah quantity-nya saja jika belum mencapai batas stok
+      if (_items[existingIndex].quantity < product.stock) {
+        _items[existingIndex].quantity++;
+      }
     } else {
-      // Kalau belum ada, masukkan sebagai item baru
-      _items.add(CartItem(product: product));
+      // Kalau belum ada, masukkan sebagai item baru jika stok masih ada
+      if (product.stock > 0) {
+        _items.add(CartItem(product: product));
+      }
     }
     notifyListeners(); // Update UI!
   }
@@ -47,8 +51,10 @@ class CartProvider extends ChangeNotifier {
   // 2. TAMBAH JUMLAH (Tombol +) 
   void increaseQuantity(int index) {
     if (index >= 0 && index < _items.length) {
-      _items[index].quantity++;
-      notifyListeners();
+      if (_items[index].quantity < _items[index].product.stock) {
+        _items[index].quantity++;
+        notifyListeners();
+      }
     }
   }
 

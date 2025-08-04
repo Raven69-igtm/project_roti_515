@@ -6,12 +6,14 @@ class RegisterButton extends StatelessWidget {
   final bool isLoading;
   final bool isAgreed;
   final VoidCallback onPressed;
+  final String? label;
 
   const RegisterButton({
     super.key,
     required this.isLoading,
     required this.isAgreed,
     required this.onPressed,
+    this.label,
   });
 
   @override
@@ -33,14 +35,15 @@ class RegisterButton extends StatelessWidget {
         onPressed: (isLoading || !isAgreed) ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: context.colors.primaryOrange,
-          disabledBackgroundColor: context.colors.primaryOrange.withValues(alpha: 0.5),
+          disabledBackgroundColor:
+              context.colors.primaryOrange.withValues(alpha: 0.5),
           shape: StadiumBorder(),
           elevation: 0,
         ),
         child: isLoading
             ? CircularProgressIndicator(color: Colors.white)
             : Text(
-                "Daftar",
+                label ?? "Daftar",
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
