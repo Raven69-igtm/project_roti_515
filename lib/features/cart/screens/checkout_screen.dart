@@ -18,55 +18,59 @@ class CheckoutScreen extends StatefulWidget {
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 class _CheckoutScreenState extends State<CheckoutScreen> {
+  // Flag penanda proses pemesanan ke server sedang berjalan
   bool _isOrdering = false;
+  // Biaya pengiriman/ongkir (diset 0 karena ambil langsung ke toko)
   static final int _deliveryFee = 0;
-  String _guestAddress = "Ambil Di Toko";
 
   @override
   void initState() {
     super.initState();
-    _fetchUserAddress();
   }
 
-  Future<void> _fetchUserAddress() async {
-    final auth = Provider.of<AuthProvider>(context, listen: false);
-    if (auth.token == null || auth.token!.isEmpty) return;
-
-    try {
-      final response = await http.get(
-        Uri.parse(ApiService.profile),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${auth.token}",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (mounted && data['user'] != null && data['user']['address'] != null && data['user']['address'].isNotEmpty) {
-          setState(() {
-            _guestAddress = data['user']['address'];
-          });
-        }
-      }
-    } catch (e) {
-      debugPrint("Error fetching address: $e");
-    }
-  }
-
-  // --- LOGIKA UTAMA ---
-
+  // --- LOGIKA UTAMA: PROSES CHECKOUT PESANAN ---
   Future<void> _placeOrder() async {
-    setState(() => _isOrdering = true);
     final cart = Provider.of<CartProvider>(context, listen: false);
+    
+    // Validasi 1: Pastikan keranjang belanja tidak kosong
+    if (cart.items.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Keranjang belanja kosong",
+                style: GoogleFonts.plusJakartaSans(color: Colors.white)),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isOrdering = true);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
     final int finalTotal = cart.totalPrice + _deliveryFee;
 
+    // Validasi 2: Pastikan token user aktif (sudah login) sebelum checkout
+    if (auth.token == null || auth.token!.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Anda harus login untuk memesan",
+                style: GoogleFonts.plusJakartaSans()),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+      setState(() => _isOrdering = false);
+      return;
+    }
+
     try {
+      // 1. Menyusun payload data pesanan sesuai dengan parameter backend
       final orderData = {
-        "guest_name": "Pelanggan Toko",
-        "guest_phone": "-",
-        "guest_address": _guestAddress,
+        "jadwal_ambil_id": 0,       // 0 = tidak ada jadwal khusus (diambil langsung)
         "total": finalTotal.toDouble(),
+        "metode_bayar": "Cash",
         "items": cart.items
             .map((item) => {
                   "product_id": item.product.id,
@@ -76,45 +80,43 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             .toList(),
       };
 
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-
+      // 2. Mengirim data pesanan ke backend dengan otentikasi JWT Bearer Token
       final response = await http.post(
         Uri.parse(ApiService.orders),
         headers: {
           "Content-Type": "application/json",
-          if (auth.token != null && auth.token!.isNotEmpty)
-            "Authorization": "Bearer ${auth.token}",
+          "Authorization": "Bearer ${auth.token}", // Token otentikasi admin/pelanggan
         },
         body: jsonEncode(orderData),
       );
 
+      // 3. Jika respon server 200 (OK/Sukses), bersihkan keranjang dan pindah ke halaman sukses
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final String orderCode = data['order_ref'] ?? '#ROTI515-${data['order_id']}';
+        final String orderCode = (data['order_ref'] != null && data['order_ref'].toString().isNotEmpty) ? data['order_ref'] : 'ROTI515-${data['order_id']}';
 
-        cart.clearCart();
-        if (!context.mounted) return;
-        final currentContext = context;
-        Navigator.pushNamedAndRemoveUntil(
-          currentContext,
-          AppRoutes.checkoutSuccess,
-          (route) => false,
-          arguments: orderCode, // Kirim kode real dari backend
-        );
+        cart.clearCart(); // Kosongkan keranjang belanja setelah checkout sukses
+        if (mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.checkoutSuccess,
+            (route) => false,
+            arguments: orderCode,
+          );
+        }
       } else {
-        throw Exception(
-            "Gagal membuat pesanan (Error: ${response.statusCode}).");
+        throw Exception("Gagal membuat pesanan (${response.statusCode})");
       }
     } catch (e) {
-      if (!context.mounted) return;
-      final currentContext = context;
-      ScaffoldMessenger.of(currentContext).showSnackBar(
-        SnackBar(
-          content: Text("Error: $e",
-              style: GoogleFonts.plusJakartaSans(color: context.colors.white)),
-          backgroundColor: context.colors.error,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Terjadi kesalahan: $e",
+                style: GoogleFonts.plusJakartaSans(color: Colors.white)),
+            backgroundColor: context.colors.error,
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isOrdering = false);
     }
@@ -177,7 +179,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
       centerTitle: true,
       title: Text(
-        'Checkout',
+        'Pembayaran',
         style: GoogleFonts.plusJakartaSans(
           color: context.colors.textDark,
           fontWeight: FontWeight.w700,

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/utils/price_formatter.dart';
+import '../../../core/widgets/universal_image.dart';
 import '../providers/cart_provider.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 
@@ -36,8 +37,8 @@ class CartItemCard extends StatelessWidget {
           // Gambar
           ClipRRect(
             borderRadius: BorderRadius.circular(32),
-            child: Image.network(
-              item.product.imageUrl.isNotEmpty
+            child: UniversalImage(
+              imageUrl: item.product.imageUrl.isNotEmpty
                   ? item.product.imageUrl
                   : "https://placehold.co/88x88",
               width: 88,
@@ -56,7 +57,7 @@ class CartItemCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        item.product.name,
+                        item.product.nama,
                         style: GoogleFonts.plusJakartaSans(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -90,7 +91,7 @@ class CartItemCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Rp ${formatRupiah(item.product.price)}",
+                      "Rp ${formatRupiah(item.product.harga)}",
                       style: GoogleFonts.plusJakartaSans(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -204,3 +205,4 @@ class _CircleBtn extends StatelessWidget {
     );
   }
 }
+

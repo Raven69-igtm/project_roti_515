@@ -42,7 +42,7 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
     // ── Step 1: ikon check muncul (elastis) ──────────────────────────────
     _circleCtrl = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
     );
     _circleScale = CurvedAnimation(
       parent: _circleCtrl,
@@ -50,13 +50,13 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
     );
     _circleFade = CurvedAnimation(
       parent: _circleCtrl,
-      curve: Interval(0.0, 0.5, curve: Curves.easeOut),
+      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
     );
 
     // ── Step 2: teks slide dari bawah ──────────────────────────────────
     _textCtrl = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
     );
     _textSlide = Tween<double>(begin: 30, end: 0)
         .chain(CurveTween(curve: Curves.easeOut))
@@ -69,7 +69,7 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
     // ── Step 3: tombol muncul ──────────────────────────────────────────
     _btnCtrl = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 400),
     );
     _btnFade = CurvedAnimation(parent: _btnCtrl, curve: Curves.easeOut);
     _btnSlide = Tween<double>(begin: 20, end: 0)
@@ -81,11 +81,11 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
   }
 
   Future<void> _runSequence() async {
-    await Future.delayed(Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 150));
     _circleCtrl.forward();
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 400));
     _textCtrl.forward();
-    await Future.delayed(Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 300));
     _btnCtrl.forward();
   }
 
@@ -100,7 +100,7 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8F7F6),
+      backgroundColor: context.colors.bgColor,
       body: Stack(
         children: [
           // ── Latar radial gradient halus (opacity sangat rendah) ──────
@@ -112,18 +112,18 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
           SafeArea(
             child: Column(
               children: [
-                Spacer(flex: 2),
+                const Spacer(flex: 2),
 
                 // Ikon sukses
                 ScaleTransition(
                   scale: _circleScale,
                   child: FadeTransition(
                     opacity: _circleFade,
-                    child: _SuccessIcon(),
+                    child: const _SuccessIcon(),
                   ),
                 ),
 
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
 
                 // Judul & reference
                 AnimatedBuilder(
@@ -138,7 +138,7 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
                   child: _OrderInfo(orderRef: widget.orderRef),
                 ),
 
-                Spacer(flex: 3),
+                const Spacer(flex: 3),
 
                 // Tombol + branding
                 AnimatedBuilder(
@@ -159,7 +159,7 @@ class _CheckoutSuccessScreenState extends State<CheckoutSuccessScreen>
                   ),
                 ),
 
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -182,8 +182,8 @@ class _RadialBgPainter extends CustomPainter {
         center: Alignment.center,
         radius: 0.75,
         colors: [
-          Color(0xFFD47311).withValues(alpha: 0.06),
-          Color(0xFFD47311).withValues(alpha: 0.0),
+          const Color(0xFFD47311).withValues(alpha: 0.06),
+          const Color(0xFFD47311).withValues(alpha: 0.0),
         ],
       ).createShader(rect);
     canvas.drawRect(rect, paint);
@@ -202,7 +202,7 @@ class _SuccessIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color greenColor = Color(0xFF22C55E);
+    const greenColor = Color(0xFF22C55E);
 
     return Container(
       width: 96,
@@ -211,7 +211,7 @@ class _SuccessIcon extends StatelessWidget {
         color: greenColor.withValues(alpha: 0.10),
         shape: BoxShape.circle,
       ),
-      child: Icon(
+      child: const Icon(
         Icons.check_circle_rounded,
         color: greenColor,
         size: 50,
@@ -239,11 +239,11 @@ class _OrderInfo extends StatelessWidget {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 32,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF0F172A),
+            color: context.colors.textDark,
             height: 40 / 32,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
 
         // Referensi pesanan
         RichText(
@@ -255,7 +255,7 @@ class _OrderInfo extends StatelessWidget {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF64748B),
+                  color: context.colors.textGrey,
                   height: 28 / 18,
                 ),
               ),
@@ -264,7 +264,7 @@ class _OrderInfo extends StatelessWidget {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155),
+                  color: context.colors.textDark,
                 ),
               ),
             ],
@@ -297,8 +297,8 @@ class _BottomActionsState extends State<_BottomActions>
     super.initState();
     _pressCtrl = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 100),
-      reverseDuration: Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 150),
     );
     _pressScale = Tween<double>(begin: 1.0, end: 0.96)
         .chain(CurveTween(curve: Curves.easeInOut))
@@ -320,7 +320,7 @@ class _BottomActionsState extends State<_BottomActions>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
         children: [
           // Tombol "Kembali ke Beranda"
@@ -337,7 +337,7 @@ class _BottomActionsState extends State<_BottomActions>
                     BoxShadow(
                       color: context.colors.primaryOrange.withValues(alpha: 0.30),
                       blurRadius: 16,
-                      offset: Offset(0, 8),
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
@@ -357,7 +357,7 @@ class _BottomActionsState extends State<_BottomActions>
             ),
           ),
 
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Branding kecil
           Text(
@@ -365,7 +365,7 @@ class _BottomActionsState extends State<_BottomActions>
             style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF94A3B8),
+              color: context.colors.textHint,
               height: 20 / 14,
             ),
           ),
@@ -374,10 +374,6 @@ class _BottomActionsState extends State<_BottomActions>
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER: Generate kode referensi pesanan
-// ─────────────────────────────────────────────────────────────────────────────
 
 String generateOrderRef() {
   final rand = Random().nextInt(90000) + 10000;
