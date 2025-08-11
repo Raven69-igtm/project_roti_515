@@ -178,3 +178,4 @@ class CartEmptyState extends StatelessWidget {
     );
   }
 }
+

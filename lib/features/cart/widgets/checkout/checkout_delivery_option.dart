@@ -40,9 +40,6 @@ class CheckoutDeliveryOption extends StatelessWidget {
                   children: [
                     Text('Ambil Di Toko',
                         style: jakartaBold(16, context.colors.textDark)),
-                    SizedBox(height: 2),
-                    Text('Tersedia dalam 15 menit',
-                        style: jakartaRegular(12, context.colors.textBrown)),
                   ],
                 ),
               ),
