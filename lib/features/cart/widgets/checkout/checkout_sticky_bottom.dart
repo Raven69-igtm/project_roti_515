@@ -122,3 +122,4 @@ class CheckoutStickyBottom extends StatelessWidget {
     );
   }
 }
+
