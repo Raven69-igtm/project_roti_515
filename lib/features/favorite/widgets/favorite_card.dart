@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/utils/price_formatter.dart';
+import '../../../core/widgets/universal_image.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../product/models/product_model.dart';
 import '../../../core/utils/premium_snackbar.dart';
@@ -47,8 +48,8 @@ class FavoriteCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(32),
                   child: Hero(
                     tag: 'product-image-${product.id}',
-                    child: Image.network(
-                      product.imageUrl,
+                    child: UniversalImage(
+                      imageUrl: product.imageUrl,
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -148,3 +149,4 @@ class FavoriteCard extends StatelessWidget {
     );
   }
 }
+

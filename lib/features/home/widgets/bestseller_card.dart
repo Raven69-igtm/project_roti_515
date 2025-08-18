@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../../core/utils/page_transitions.dart';
 import '../../../core/utils/price_formatter.dart';
+import '../../../core/widgets/universal_image.dart';
 import '../../product/models/product_model.dart';
 import '../../../core/utils/premium_snackbar.dart';
 import '../../product/screens/product_detail_screen.dart';
@@ -28,6 +29,7 @@ class BestsellerCard extends StatelessWidget {
     return Container(
       width: 170, // Sama seperti ukuran ideal ProductCard di layout grid 2 kolom
       margin: EdgeInsets.only(right: 16), // Jarak margin kanan antar kartu sebesar 16
+      clipBehavior: Clip.hardEdge, // Pastikan konten tidak meluber keluar card
       decoration: BoxDecoration(
         color: context.colors.white, // Latar belakang kartu berwarna putih
         borderRadius: BorderRadius.circular(32), // Sama dengan ProductCard
@@ -46,7 +48,7 @@ class BestsellerCard extends StatelessWidget {
         children: [
           // Area Gambar Produk (Thumbnail)
           Padding(
-            padding: EdgeInsets.all(13), // Padding di sekeliling gambar
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 6), // kurangi padding gambar
             // Menggunakan Stack untuk menumpuk elemen: [1]Gambar Roti, di atasnya ada [2]Rating, dan [3]Love
             child: Stack(
               children: [
@@ -56,11 +58,11 @@ class BestsellerCard extends StatelessWidget {
                   // Memuat URL foto produk dari server melalui network
                   child: Hero(
                     tag: 'product-image-${product.id}',
-                    child: Image.network(
-                      product.imageUrl,
-                      height: 150, // Gambar menempati tinggi tetap
-                      width: double.infinity, // Melebar penuh mengisi sisi memanjang
-                      fit: BoxFit.cover, // Gambar dipotong menyesuaikan proporsi (tidak gepeng)
+                    child: UniversalImage(
+                      imageUrl: product.gambar,
+                      height: 135, // Kurangi dari 150 agar tidak overflow
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -119,7 +121,7 @@ class BestsellerCard extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: product.stock == 0 
+                      color: product.stok == 0 
                           ? context.colors.error.withValues(alpha: 0.9) 
                           : context.colors.primaryOrange.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(12),
@@ -128,13 +130,13 @@ class BestsellerCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          product.stock == 0 ? Icons.block_flipped : Icons.inventory_2_rounded,
+                          product.stok == 0 ? Icons.block_flipped : Icons.inventory_2_rounded,
                           size: 10,
                           color: Colors.white,
                         ),
                         SizedBox(width: 4),
                         Text(
-                          product.stock == 0 ? "Habis" : "${product.stock}",
+                          product.stok == 0 ? "Habis" : "${product.stok}",
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -186,20 +188,20 @@ class BestsellerCard extends StatelessWidget {
           
           // Area Teks Detail: Judul, Deskripsi, Harga (Bagian paruh bawah kartu)
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.fromLTRB(14, 6, 14, 8),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Rata kiri teks
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Label Judul "Nama Roti"
                 Text(
-                  product.name,
+                  product.nama,
                   style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                     color: context.colors.textDark,
                   ),
-                  maxLines: 1, // Batasi 1 baris supaya layout rapi
-                  overflow: TextOverflow.ellipsis, // Jika kepanjangan, potong dengan tanda "..."
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 
                 // Label Deskripsi Varian Roti (Kecil)
@@ -208,40 +210,59 @@ class BestsellerCard extends StatelessWidget {
                   style: GoogleFonts.pontanoSans(
                     fontSize: 12,
                     color: context.colors.textGrey,
-                    fontWeight: FontWeight.w500, // Ketebalan netral
+                    fontWeight: FontWeight.w500,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 12), // Jeda atas sebelum area blok harga
+                const SizedBox(height: 4),
+                Text(
+                  "Terjual ${product.soldCount}",
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: context.colors.primaryOrange,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 
-                // Row untuk meletakkan "Label Harga" rata kiri dan "Tombol Plus" mentok di ujung kanan
+                // Row Harga + Tombol (+)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Nilai angka harga Rupiah dengan format string converter kustom
-                    Text(
-                      "Rp ${formatRupiah(product.price)}",
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: context.colors.textDark,
+                    // Harga — dibungkus Flexible agar tidak overflow jika harga panjang
+                    Flexible(
+                      child: Text(
+                        "Rp ${formatRupiah(product.harga)}",
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: context.colors.textDark,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     
-                    // Lingkaran Hitam bulat Tombol (+) Tambah ke keranjang belanja
+                    // Tombol (+) Tambah ke keranjang
                     GestureDetector(
                       onTap: () {
                         Provider.of<CartProvider>(context, listen: false).addToCart(product);
-                        _showAddedSnackBar(context, product.name);
+                        _showAddedSnackBar(context, product.nama);
                       },
                       child: Container(
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                            color: context.colors.textDark, shape: BoxShape.circle),
-                        child: Icon(Icons.add_rounded,
-                            color: context.colors.white, size: 16), // Ikon panah simpul warna putih
+                          color: context.colors.textDark,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.add_rounded,
+                          color: context.colors.white,
+                          size: 16,
+                        ),
                       ),
                     ),
                   ],
@@ -254,3 +275,4 @@ class BestsellerCard extends StatelessWidget {
     );
   }
 }
+

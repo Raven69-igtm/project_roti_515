@@ -33,11 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Controller untuk horizontal list bestseller
   final ScrollController _bestsellerScrollController = ScrollController();
 
-  @override
-  void dispose() {
-    _bestsellerScrollController.dispose();
-    super.dispose();
-  }
+
 
   // Fungsi scroll kiri/kanan untuk bestseller
   void _scrollBestseller(bool right) {
@@ -62,7 +58,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Ambil data produk saat layar pertama dibuka
     final productProvider = Provider.of<ProductProvider>(context, listen: false);
-    Future.microtask(() => productProvider.fetchProducts());
+    Future.microtask(() {
+      productProvider.fetchProducts();
+      productProvider.startPolling();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Hentikan polling saat HomeScreen dihancurkan
+    Provider.of<ProductProvider>(context, listen: false).stopPolling();
+    _bestsellerScrollController.dispose();
+    super.dispose();
   }
 
   /// Dipanggil saat user mengetik di search bar.
@@ -129,14 +136,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // Bestsellers
                     HomeSectionHeader(
-                      title: "Bestsellers",
+                      title: "Terlaris",
                       showArrows: true,
                       onLeftArrowTap: () => _scrollBestseller(false),
                       onRightArrowTap: () => _scrollBestseller(true),
                     ),
                     SizedBox(height: 16),
                     SizedBox(
-                      height: 260,
+                      height: 285,
                       child: ListView.builder(
                         controller: _bestsellerScrollController,
                         scrollDirection: Axis.horizontal,
