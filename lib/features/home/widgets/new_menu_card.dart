@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../../core/utils/page_transitions.dart';
 import '../../../core/utils/price_formatter.dart';
+import '../../../core/widgets/universal_image.dart';
 import '../../product/models/product_model.dart';
 import '../../../core/utils/premium_snackbar.dart';
 import '../../product/screens/product_detail_screen.dart';
@@ -47,8 +48,8 @@ class NewMenuCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(32),
               child: Hero(
                 tag: 'product-image-${product.id}',
-                child: Image.network(
-                  product.imageUrl,
+                child: UniversalImage(
+                  imageUrl: product.gambar,
                   width: 80,
                   height: 80,
                   fit: BoxFit.cover,
@@ -64,7 +65,7 @@ class NewMenuCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
+                    product.nama,
                     style: GoogleFonts.plusJakartaSans(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -88,7 +89,7 @@ class NewMenuCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Rp ${formatRupiah(product.price)}",
+                        "Rp ${formatRupiah(product.harga)}",
                         style: GoogleFonts.plusJakartaSans(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -99,7 +100,7 @@ class NewMenuCard extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           Provider.of<CartProvider>(context, listen: false).addToCart(product);
-                          _showAddedSnackBar(context, product.name);
+                          _showAddedSnackBar(context, product.nama);
                         },
                         child: Container(
                           width: 28,
@@ -121,3 +122,4 @@ class NewMenuCard extends StatelessWidget {
     );
   }
 }
+

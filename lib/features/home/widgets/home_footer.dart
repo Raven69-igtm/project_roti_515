@@ -215,9 +215,11 @@ class HomeFooter extends StatelessWidget {
   Widget _buildSocialBtn(IconData icon, Color bg, Color iconColor, String url) {
     return GestureDetector(
       onTap: () async {
-        final uri = Uri.parse(url);
-        if (await canLaunchUrl(uri)) {
+        try {
+          final uri = Uri.parse(url);
           await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } catch (e) {
+          debugPrint('Could not launch $url: $e');
         }
       },
       child: Container(
@@ -239,9 +241,11 @@ class _MapContentView extends StatelessWidget {
   final String _googleMapsUrl = 'https://maps.app.goo.gl/sK5XzhsLK179oXfw6';
 
   Future<void> _launchMaps() async {
-    final Uri url = Uri.parse(_googleMapsUrl);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url');
+    try {
+      final Uri url = Uri.parse(_googleMapsUrl);
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch maps: $e');
     }
   }
 
