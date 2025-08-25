@@ -1,11 +1,16 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
+import '../../../core/utils/page_transitions.dart';
 import '../../../core/widgets/staggered_fade_animation.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/notification_provider.dart';
+import '../screens/notification_detail_screen.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
+import '../../../core/network/api_service.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -15,242 +20,304 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  Map<int, dynamic> _ordersMap = {};
+
+  // Mengambil seluruh pesanan pengguna untuk dicocokkan dengan notifikasi
+  Future<void> _fetchOrdersForMap() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      final response = await http.get(
+        Uri.parse(ApiService.userOrders),
+        headers: {"Authorization": "Bearer ${authProvider.token}"},
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> parsedOrders = [];
+        if (data is List) {
+          parsedOrders = data;
+        } else if (data is Map && data.containsKey('data')) {
+          parsedOrders = data['data'];
+        }
+        final Map<int, dynamic> tempMap = {};
+        for (var o in parsedOrders) {
+          final id = o['id'];
+          if (id != null) {
+            tempMap[id] = o;
+          }
+        }
+        if (mounted) {
+          setState(() {
+            _ordersMap = tempMap;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching orders for map: $e");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final notificationProvider =
         Provider.of<NotificationProvider>(context, listen: false);
-    Future.microtask(() {
-      notificationProvider.fetchNotifications(authProvider.token);
+    Future.microtask(() async {
+      await notificationProvider.fetchNotifications(authProvider.token);
+      await _fetchOrdersForMap();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: context.colors.bgColor, // Latar belakang premium
-      body: CustomScrollView(
-        physics: BouncingScrollPhysics(),
-        slivers: [
-          // --- App Bar Premium ---
-          SliverAppBar(
-            backgroundColor: context.colors.bgColor,
-            elevation: 0,
-            pinned: true,
-            centerTitle: true,
-            iconTheme: IconThemeData(color: context.colors.textDark),
-            title: Text(
-              "Notifikasi",
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: context.colors.textDark,
-                letterSpacing: 0,
+      body: RefreshIndicator(
+        color: context.colors.primaryOrange,
+        onRefresh: () async {
+          await notificationProvider.fetchNotifications(authProvider.token);
+          await _fetchOrdersForMap();
+        },
+        child: CustomScrollView(
+          physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers: [
+            // --- App Bar Premium ---
+            SliverAppBar(
+              backgroundColor: context.colors.bgColor,
+              elevation: 0,
+              pinned: true,
+              centerTitle: true,
+              iconTheme: IconThemeData(color: context.colors.textDark),
+              title: Text(
+                "Notifikasi",
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: context.colors.textDark,
+                  letterSpacing: 0,
+                ),
               ),
-            ),
-            actions: [
-              Consumer<NotificationProvider>(
-                builder: (context, provider, _) {
-                  if (provider.notifications.isEmpty) return SizedBox();
-                  return Padding(
-                    padding: EdgeInsets.only(right: 8.0, top: 8.0),
-                    child: IconButton(
-                      onPressed: () => _confirmDeleteAll(
-                          context, provider, authProvider.token),
-                      icon: Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
+              actions: [
+                Consumer<NotificationProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.notifications.isEmpty) return SizedBox();
+                    return Padding(
+                      padding: EdgeInsets.only(right: 8.0, top: 8.0),
+                      child: IconButton(
+                        onPressed: () => _confirmDeleteAll(
+                            context, provider, authProvider.token),
+                        icon: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.delete_sweep_rounded,
+                            color: Colors.redAccent,
+                            size: 22,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.delete_sweep_rounded,
-                          color: Colors.redAccent,
-                          size: 22,
+                        tooltip: "Hapus Semua",
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+  
+            // --- Konten ---
+            SliverToBoxAdapter(
+              child: Consumer<NotificationProvider>(
+                builder: (context, provider, _) {
+                  // Loading State
+                  if (provider.isLoading && provider.notifications.isEmpty) {
+                    return SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                            color: context.colors.primaryOrange),
+                      ),
+                    );
+                  }
+  
+                  // Error State
+                  if (provider.error.isNotEmpty && provider.notifications.isEmpty) {
+                    return SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.05),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.wifi_off_rounded,
+                                  size: 50, color: Colors.redAccent),
+                            ),
+                            SizedBox(height: 20),
+                            Text("Gagal Memuat Data",
+                                style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: context.colors.textDark)),
+                            SizedBox(height: 8),
+                            Text(provider.error,
+                                style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 14, color: context.colors.textGrey)),
+                            SizedBox(height: 24),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  provider.fetchNotifications(authProvider.token),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: context.colors.primaryOrange,
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 32, vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(99)),
+                              ),
+                              child: Text(
+                                "Coba Lagi",
+                                style: GoogleFonts.plusJakartaSans(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      tooltip: "Hapus Semua",
+                    );
+                  }
+  
+                  // Empty State Premium
+                  if (provider.notifications.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Custom Icon Layout
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        context.colors.primaryOrange
+                                            .withValues(alpha: 0.15),
+                                        Colors.transparent
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0x0C000000),
+                                        blurRadius: 20,
+                                        offset: Offset(0, 10),
+                                      )
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.notifications_active_outlined,
+                                    size: 40,
+                                    color: context.colors.primaryOrange,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 32),
+                            Text(
+                              "Belum ada Notifikasi",
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: context.colors.textDark,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Kami akan memberi tahu saat ada\npembaruan pesanan Anda.",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                color: context.colors.textGrey,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+  
+                  // List Notifikasi (Dilengkapi Staggered Animation)
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: List.generate(provider.notifications.length,
+                          (index) {
+                        final notif = provider.notifications[index];
+                        // Menampilkan jarak tipis antar kartu
+                        return Column(
+                          children: [
+                            StaggeredFadeAnimation(
+                              index: index,
+                              child: _buildNotificationCard(
+                                  notif, provider, authProvider.token),
+                            ),
+                            SizedBox(height: 16),
+                          ],
+                        );
+                      }),
                     ),
                   );
                 },
               ),
-            ],
-          ),
-
-          // --- Konten ---
-          SliverToBoxAdapter(
-            child: Consumer<NotificationProvider>(
-              builder: (context, provider, _) {
-                // Loading State
-                if (provider.isLoading && provider.notifications.isEmpty) {
-                  return SizedBox(
-                    height: 400,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                          color: context.colors.primaryOrange),
-                    ),
-                  );
-                }
-
-                // Error State
-                if (provider.error.isNotEmpty && provider.notifications.isEmpty) {
-                  return SizedBox(
-                    height: 400,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.05),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.wifi_off_rounded,
-                                size: 50, color: Colors.redAccent),
-                          ),
-                          SizedBox(height: 20),
-                          Text("Gagal Memuat Data",
-                              style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: context.colors.textDark)),
-                          SizedBox(height: 8),
-                          Text(provider.error,
-                              style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 14, color: context.colors.textGrey)),
-                          SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: () =>
-                                provider.fetchNotifications(authProvider.token),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.colors.primaryOrange,
-                              elevation: 0,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 32, vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(99)),
-                            ),
-                            child: Text(
-                              "Coba Lagi",
-                              style: GoogleFonts.plusJakartaSans(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                // Empty State Premium
-                if (provider.notifications.isEmpty) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Custom Icon Layout
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: RadialGradient(
-                                    colors: [
-                                      context.colors.primaryOrange
-                                          .withValues(alpha: 0.15),
-                                      Colors.transparent
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0x0C000000),
-                                      blurRadius: 20,
-                                      offset: Offset(0, 10),
-                                    )
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.notifications_active_outlined,
-                                  size: 40,
-                                  color: context.colors.primaryOrange,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 32),
-                          Text(
-                            "Belum ada Notifikasi",
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: context.colors.textDark,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Kami akan memberi tahu saat ada promo\natau pembaruan pesanan Anda.",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              color: context.colors.textGrey,
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                // List Notifikasi (Dilengkapi Staggered Animation)
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: List.generate(provider.notifications.length,
-                        (index) {
-                      final notif = provider.notifications[index];
-                      // Menampilkan jarak tipis antar kartu
-                      return Column(
-                        children: [
-                          StaggeredFadeAnimation(
-                            index: index,
-                            child: _buildNotificationCard(
-                                notif, provider, authProvider.token),
-                          ),
-                          SizedBox(height: 16),
-                        ],
-                      );
-                    }),
-                  ),
-                );
-              },
             ),
-          ),
-          SliverToBoxAdapter(child: SizedBox(height: 40)),
-        ],
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 80 + MediaQuery.of(context).padding.bottom,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildNotificationCard(dynamic notif,
       NotificationProvider provider, String? token) {
+    // Mem-parse order rujukan atau ID jika notifikasi berkaitan dengan pesanan
+    final refMatch = RegExp(r'(515-\d+)').firstMatch(notif.message)?.group(1);
+    final idMatch = RegExp(r'#(\d+)').firstMatch(notif.message)?.group(1);
+    final int? orderId = idMatch != null ? int.tryParse(idMatch) : null;
+    final order = _ordersMap.values.firstWhere(
+      (o) {
+        if (refMatch != null && o['order_ref'] == refMatch) return true;
+        if (orderId != null && o['id'] == orderId) return true;
+        return false;
+      },
+      orElse: () => null,
+    );
+
     return Dismissible(
       key: ValueKey(notif.id),
       direction: DismissDirection.endToStart,
@@ -310,6 +377,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
           if (!notif.isRead) {
             provider.markAsRead(notif.id, token);
           }
+          Navigator.of(context).push(
+            ZoomPageRoute(
+              page: NotificationDetailScreen(notif: notif),
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(20),
         splashColor: context.colors.primaryOrange.withValues(alpha: 0.1),
@@ -422,6 +494,87 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               height: 1.5, // Line height yang nyaman
                             ),
                           ),
+                          // Menampilkan box informasi detail pengambilan & kode produk jika data pesanan ada
+                          if (order != null) ...[
+                            SizedBox(height: 10),
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: context.colors.bgColor,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: context.colors.divider),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.tag_rounded, size: 14, color: context.colors.primaryOrange),
+                                      SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          "Ref Pesanan: ${order['order_ref'] ?? '#ROTI515-${order['id']}'}",
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: context.colors.textDark,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.access_time_rounded, size: 14, color: Color(0xFFD47311)),
+                                      SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          "Jam Pengambilan: ${order['pickup_time'] ?? order['jam_ambil'] ?? 'Belum ditentukan'}",
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFFD47311),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.bakery_dining_rounded, size: 14, color: context.colors.textGrey),
+                                      SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          "Produk: ${((order['items'] as List?) ?? []).map((item) {
+                                            final food = item['food'] ?? item['product'] ?? {};
+                                            return "${food['name'] ?? 'Roti'} (#${food['id'] ?? '-'})";
+                                          }).join(', ')}",
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 11,
+                                            color: context.colors.textGrey,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ] else if (refMatch != null || orderId != null) ...[
+                            SizedBox(height: 8),
+                            Text(
+                              "Memuat info pesanan...",
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                fontStyle: FontStyle.italic,
+                                color: context.colors.textHint,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     )

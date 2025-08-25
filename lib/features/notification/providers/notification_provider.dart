@@ -39,7 +39,10 @@ class NotificationProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        _notifications = data.map((n) => NotificationModel.fromJson(n)).toList();
+        _notifications = data
+            .map((n) => NotificationModel.fromJson(n))
+            .where((n) => !n.title.toLowerCase().contains('promo'))
+            .toList();
       } else {
         _error = 'Gagal memuat notifikasi (${response.statusCode})';
       }
