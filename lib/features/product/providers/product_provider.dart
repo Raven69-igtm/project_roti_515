@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,7 @@ class ProductProvider extends ChangeNotifier {
   String _selectedCategory = 'All';
   String _searchQuery = '';
   String _sortOption = 'bestseller'; // Sortir aktif: bestseller | newest | price_asc | price_desc
+  Timer? _pollingTimer;
 
   // Getters untuk diakses oleh UI
   List<ProductModel> get products => _products;
@@ -23,8 +25,11 @@ class ProductProvider extends ChangeNotifier {
   String get sortOption => _sortOption;
 
   /// Memfilter produk unggulan (Bestseller)
-  List<ProductModel> get bestsellers =>
-      _products.where((p) => p.isBestseller == true).toList();
+  List<ProductModel> get bestsellers {
+    final list = _products.where((p) => p.isBestseller == true).toList();
+    list.sort((a, b) => b.soldCount.compareTo(a.soldCount));
+    return list;
+  }
 
   /// Memfilter produk menu baru (Non-Bestseller)
   List<ProductModel> get newMenus =>
@@ -39,6 +44,7 @@ class ProductProvider extends ChangeNotifier {
   Future<void> fetchProducts({String? query, String? sort}) async {
     _isLoading = true;
     _errorMessage = '';
+    notifyListeners();
 
     if (query != null) {
       _searchQuery = query;
@@ -63,7 +69,7 @@ class ProductProvider extends ChangeNotifier {
       debugPrint("📡 Memeriksa API: $uri");
 
       // Modifikasi timeout 10 detik untuk mencegah aplikasi menggantung (hang)
-      final response = await http.get(uri).timeout(Duration(seconds: 10));
+      final response = await http.get(uri).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedData = jsonDecode(response.body);
@@ -74,7 +80,7 @@ class ProductProvider extends ChangeNotifier {
         _products = listData.map((json) {
           // Menyesuaikan path gambar relatif dari database menjadi absolute URL static files
           String fileName = json['image_url'] ?? '';
-          if (fileName.isNotEmpty && !fileName.startsWith('http')) {
+          if (fileName.isNotEmpty && !fileName.startsWith('http') && !fileName.startsWith('data:image')) {
             json['image_url'] = '$_staticUrl$fileName';
           }
           return ProductModel.fromJson(json);
@@ -114,6 +120,73 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  /// Memulai polling otomatis di latar belakang setiap 10 detik.
+  void startPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (!_isLoading) {
+        _fetchProductsSilent();
+      }
+    });
+  }
+
+  /// Menghentikan polling otomatis.
+  void stopPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+  }
+
+  /// Refresh produk diam-diam di latar belakang (tanpa loader fullscreen).
+  Future<void> _fetchProductsSilent() async {
+    try {
+      final Map<String, String> queryParameters = {};
+
+      if (_selectedCategory != 'All') {
+        queryParameters['category'] = _selectedCategory;
+      }
+
+      if (_searchQuery.isNotEmpty) {
+        queryParameters['search'] = _searchQuery;
+      }
+
+      final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParameters);
+      final response = await http.get(uri).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> decodedData = jsonDecode(response.body);
+        final List<dynamic> listData = decodedData['data'] ?? [];
+
+        final List<ProductModel> updatedProducts = listData.map((json) {
+          String fileName = json['image_url'] ?? '';
+          if (fileName.isNotEmpty && !fileName.startsWith('http') && !fileName.startsWith('data:image')) {
+            json['image_url'] = '$_staticUrl$fileName';
+          }
+          return ProductModel.fromJson(json);
+        }).toList();
+
+        var list = updatedProducts;
+        if (_selectedCategory != 'All') {
+          list = list
+              .where((p) => p.category.toLowerCase() == _selectedCategory.toLowerCase())
+              .toList();
+        }
+
+        if (_searchQuery.isNotEmpty) {
+          list = list
+              .where((p) =>
+                  p.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+              .toList();
+        }
+
+        _products = list;
+        _applySorting();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Silent polling error: $e");
+    }
+  }
+
   /// Memperbarui kategori produk yang sedang aktif dan menjalankan ulang request API.
   void setCategory(String category) {
     if (_selectedCategory == category) return;
@@ -133,9 +206,12 @@ class ProductProvider extends ChangeNotifier {
   void _applySorting() {
     switch (_sortOption) {
       case 'bestseller':
-        // Tampilkan bestseller di atas
-        _products.sort((a, b) =>
-            (b.isBestseller ? 1 : 0).compareTo(a.isBestseller ? 1 : 0));
+        // Tampilkan bestseller di atas, lalu urutkan berdasarkan soldCount teratas
+        _products.sort((a, b) {
+          int cmp = (b.isBestseller ? 1 : 0).compareTo(a.isBestseller ? 1 : 0);
+          if (cmp != 0) return cmp;
+          return b.soldCount.compareTo(a.soldCount);
+        });
         break;
       case 'newest':
         // Urutkan berdasarkan ID descending (ID terbesar = paling baru)
@@ -156,5 +232,11 @@ class ProductProvider extends ChangeNotifier {
     _searchQuery = '';
     _sortOption = 'bestseller';
     fetchProducts();
+  }
+
+  @override
+  void dispose() {
+    stopPolling();
+    super.dispose();
   }
 }

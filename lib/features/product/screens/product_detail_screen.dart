@@ -47,7 +47,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
 
           // Tombol kembali & favorit (floating glassmorphism)
-          DetailFloatingActions(),
+          DetailFloatingActions(product: widget.product),
 
           // Sticky bottom bar
           Align(

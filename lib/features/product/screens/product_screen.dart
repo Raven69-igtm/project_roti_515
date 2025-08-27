@@ -2,7 +2,6 @@ import 'package:flutter/material.dart'; // Import kerangka utama untuk sistem de
 import 'package:google_fonts/google_fonts.dart'; // Paket untuk menggunakan font moderen dari Google Fonts API (Inter, PragatiNarrow, dll.)
 import 'package:provider/provider.dart'; // Paket untuk memanggil State Provider agar data otomatis diperbarui jika terjadi perubahan
 
-// Mengimpor file pondasi warna (AppColors)
 // Mengimpor ProductProvider yang menyediakan filter, search, & mengunduh data daftar produk
 import '../providers/product_provider.dart';
 
@@ -27,7 +26,7 @@ class ProductScreen extends StatefulWidget {
 // Logic layar
 class _ProductScreenState extends State<ProductScreen> {
   // Membuat konfigurasi statis daftar jenis tulisan Kategori yang ditampilkan secara mendatar
-  final List<String> categories = ["Semua", "Roti", "Biskuit"];
+  final List<String> categories = ["Semua", "Roti", "Biskuit", "Snack"];
 
   // Variabel GlobalKey ini cukup krusial:
   // Kita membuat sekeranjang kunci unik (_imageKeys) yang terhubung ke indeks dari setiap "product kardus(card)".
