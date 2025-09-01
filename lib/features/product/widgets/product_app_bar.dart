@@ -24,6 +24,7 @@ class ProductAppBar extends StatefulWidget {
 }
 
 class _ProductAppBarState extends State<ProductAppBar> {
+  // Controller dan Timer untuk Debounce
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
 
@@ -35,9 +36,12 @@ class _ProductAppBarState extends State<ProductAppBar> {
   }
 
   void _onChanged(String query) {
+    // Jika pengguna masih mengetik, batalkan timer sebelumnya
     if (_debounce?.isActive ?? false) _debounce!.cancel();
+    
+    // Setel ulang timer untuk menunggu 500 milidetik
     _debounce = Timer(Duration(milliseconds: 500), () {
-      widget.onSearchChanged(query);
+      widget.onSearchChanged(query); // <-- Panggil fungsi pencarian utama
     });
   }
 

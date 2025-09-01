@@ -1,12 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../presentation/pages/profile/rating_dialog.dart';
 
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/universal_image.dart';
 import '../../models/product_model.dart';
 import '../../../../core/utils/premium_snackbar.dart';
+import '../../../../features/favorite/providers/favorite_provider.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 
 /// Header gambar besar di atas halaman detail produk.
@@ -40,9 +43,9 @@ class DetailImageHeader extends StatelessWidget {
         ),
         child: Hero(
           tag: 'product-image-${product.id}',
-          child: Image.network(
-            product.imageUrl.isNotEmpty
-                ? product.imageUrl
+          child: UniversalImage(
+            imageUrl: product.gambar.isNotEmpty
+                ? product.gambar
                 : "https://placehold.co/440x400",
             fit: BoxFit.cover,
           ),
@@ -54,7 +57,8 @@ class DetailImageHeader extends StatelessWidget {
 
 /// Baris aksi floating (back + favorit) di atas gambar.
 class DetailFloatingActions extends StatelessWidget {
-  const DetailFloatingActions({super.key});
+  final ProductModel product;
+  const DetailFloatingActions({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +74,20 @@ class DetailFloatingActions extends StatelessWidget {
             size: 18,
             onTap: () => Navigator.pop(context),
           ),
-          _GlassButton(
-            icon: Icons.favorite_border_rounded,
-            onTap: () {
-              PremiumSnackbar.showSuccess(context, "Ditambahkan ke Favorit!");
+          Consumer<FavoriteProvider>(
+            builder: (context, favProvider, _) {
+              final isFav = favProvider.isFavorite(product);
+              return _GlassButton(
+                icon: isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                color: isFav ? Colors.red : null,
+                onTap: () {
+                  favProvider.toggleFavorite(product);
+                  PremiumSnackbar.showSuccess(
+                    context,
+                    isFav ? "Dihapus dari Favorit" : "Ditambahkan ke Favorit!",
+                  );
+                },
+              );
             },
           ),
         ],
@@ -99,7 +113,7 @@ class DetailProductInfo extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  product.name,
+                  product.nama,
                   style: GoogleFonts.dmSerifDisplay(
                     fontSize: 30,
                     color: context.colors.textBrown,
@@ -142,7 +156,7 @@ class DetailProductInfo extends StatelessWidget {
                           builder: (_) => RatingDialog(
                             orderId: 0, // 0 berarti review lepas (tanpa order)
                             foodId: product.id,
-                            foodName: product.name,
+                            foodName: product.nama,
                           ),
                         );
                       },
@@ -164,7 +178,7 @@ class DetailProductInfo extends StatelessWidget {
           ),
           SizedBox(width: 16),
           Text(
-            "Rp ${formatRupiah(product.price)}",
+            "Rp ${formatRupiah(product.harga)}",
             style: GoogleFonts.dmSerifDisplay(
               fontSize: 24,
               color: context.colors.textDark,
@@ -217,8 +231,8 @@ class DetailDescription extends StatelessWidget {
                       : "Roti"),
               if (product.isBestseller) _Tag(text: "Bestseller 🔥"),
               _Tag(
-                text: product.stock == 0 ? "Stok Habis" : "Stok: ${product.stock}",
-                color: product.stock == 0 ? context.colors.error : context.colors.primaryOrange,
+                text: product.stok == 0 ? "Stok Habis" : "Stok: ${product.stok}",
+                color: product.stok == 0 ? context.colors.error : context.colors.primaryOrange,
               ),
             ],
           ),
@@ -393,8 +407,9 @@ class _GlassButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final double size;
+  final Color? color;
   const _GlassButton(
-      {required this.icon, required this.onTap, this.size = 20});
+      {required this.icon, required this.onTap, this.size = 20, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -413,10 +428,11 @@ class _GlassButton extends StatelessWidget {
               border:
                   Border.all(color: context.colors.white.withValues(alpha: 0.2)),
             ),
-            child: Icon(icon, color: context.colors.textDark, size: size),
+            child: Icon(icon, color: color ?? context.colors.textDark, size: size),
           ),
         ),
       ),
     );
   }
 }
+

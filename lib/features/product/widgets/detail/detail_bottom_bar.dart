@@ -69,7 +69,7 @@ class _DetailBottomBarState extends State<DetailBottomBar>
 
     if (!context.mounted) return;
 
-    if (widget.product.stock <= 0) return;
+    if (widget.product.stok <= 0) return;
     
     final cart = Provider.of<CartProvider>(context, listen: false);
     for (int i = 0; i < widget.quantity; i++) {
@@ -86,7 +86,7 @@ class _DetailBottomBarState extends State<DetailBottomBar>
   @override
   Widget build(BuildContext context) {
     final int totalPrice =
-        (widget.product.price * widget.quantity).toInt();
+        (widget.product.harga * widget.quantity).toInt();
 
     return ClipRRect(
       child: BackdropFilter(
@@ -100,7 +100,7 @@ class _DetailBottomBarState extends State<DetailBottomBar>
           child: GestureDetector(
             onTapDown: (_) => setState(() => _isPressed = true),
             onTapCancel: () => setState(() => _isPressed = false),
-            onTap: widget.product.stock > 0 ? () => _handleAddToCart(context) : null,
+            onTap: widget.product.stok > 0 ? () => _handleAddToCart(context) : null,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -128,7 +128,7 @@ class _DetailBottomBarState extends State<DetailBottomBar>
                   curve: Curves.easeInOut,
                   height: _isPressed ? 50 : 56,
                   decoration: BoxDecoration(
-                    color: widget.product.stock == 0
+                    color: widget.product.stok == 0
                         ? context.colors.textHint.withValues(alpha: 0.3)
                         : _isPressed
                             ? context.colors.primaryOrange.withValues(alpha: 0.88)
@@ -161,11 +161,11 @@ class _DetailBottomBarState extends State<DetailBottomBar>
                       ),
                       SizedBox(width: 12),
                       Text(
-                        widget.product.stock == 0 ? "Stok Telah Habis" : "Masukkan Keranjang  Rp ${formatRupiah(totalPrice)}",
+                        widget.product.stok == 0 ? "Stok Telah Habis" : "Masukkan Keranjang  Rp ${formatRupiah(totalPrice)}",
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: widget.product.stock == 0 ? context.colors.textHint : context.colors.white,
+                          color: widget.product.stok == 0 ? context.colors.textHint : context.colors.white,
                         ),
                       ),
                     ],
@@ -179,3 +179,4 @@ class _DetailBottomBarState extends State<DetailBottomBar>
     );
   }
 }
+
