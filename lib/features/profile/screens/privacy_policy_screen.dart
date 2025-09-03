@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 
+// Layar statis Kebijakan Privasi aplikasi Roti 515
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 

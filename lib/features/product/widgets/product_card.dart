@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/utils/price_formatter.dart';
 import '../../../core/utils/page_transitions.dart';
+import '../../../core/widgets/universal_image.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../favorite/providers/favorite_provider.dart';
 import '../models/product_model.dart';
@@ -26,7 +27,7 @@ class ProductCard extends StatelessWidget {
   });
 
   void _showAddedSnackBar(BuildContext context) {
-    PremiumSnackbar.showSuccess(context, "${product.name} ditambahkan!");
+    PremiumSnackbar.showSuccess(context, "${product.nama} ditambahkan!");
   }
 
   @override
@@ -70,9 +71,9 @@ class ProductCard extends StatelessWidget {
                         child: Hero(
                           key: imageKey,
                           tag: 'product-image-${product.id}',
-                          child: Image.network(
-                            product.imageUrl.isNotEmpty
-                                ? product.imageUrl
+                          child: UniversalImage(
+                            imageUrl: product.gambar.isNotEmpty
+                                ? product.gambar
                                 : 'https://placehold.co/400',
                             height: 150,
                             width: double.infinity,
@@ -105,7 +106,7 @@ class ProductCard extends StatelessWidget {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: product.stock == 0 
+                          color: product.stok == 0 
                               ? context.colors.error.withValues(alpha: 0.9) 
                               : context.colors.primaryOrange.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(12),
@@ -120,13 +121,13 @@ class ProductCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              product.stock == 0 ? Icons.block_flipped : Icons.inventory_2_rounded,
+                              product.stok == 0 ? Icons.block_flipped : Icons.inventory_2_rounded,
                               size: 10,
                               color: Colors.white,
                             ),
                             SizedBox(width: 4),
                             Text(
-                              product.stock == 0 ? "Habis" : "${product.stock}",
+                              product.stok == 0 ? "Habis" : "${product.stok}",
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -182,7 +183,7 @@ class ProductCard extends StatelessWidget {
                   children: [
                     // Label Judul "Nama Roti"
                     Text(
-                      product.name,
+                      product.nama,
                       style: GoogleFonts.plusJakartaSans(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -210,7 +211,7 @@ class ProductCard extends StatelessWidget {
                       children: [
                         // Nilai angka harga Rupiah dengan format string converter kustom
                         Text(
-                          "Rp ${formatRupiah(product.price)}",
+                          "Rp ${formatRupiah(product.harga)}",
                           style: GoogleFonts.plusJakartaSans(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -219,9 +220,9 @@ class ProductCard extends StatelessWidget {
                         ),
                     // ── Animasi 1: Bounce tombol add-to-cart ──
                     _AddCartButton(
-                      isEnabled: product.stock > 0,
+                      isEnabled: product.stok > 0,
                       onTap: () {
-                        if (product.stock > 0) {
+                        if (product.stok > 0) {
                           Provider.of<CartProvider>(context, listen: false)
                               .addToCart(product);
                           _showAddedSnackBar(context);
@@ -230,7 +231,7 @@ class ProductCard extends StatelessWidget {
                           CartFlyAnimation.trigger(
                             context: context,
                             sourceKey: imageKey,
-                            imageUrl: product.imageUrl,
+                            imageUrl: product.gambar,
                           );
                         }
                       },
@@ -345,3 +346,4 @@ class _RatingBadge extends StatelessWidget {
     );
   }
 }
+

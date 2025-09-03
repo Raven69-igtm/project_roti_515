@@ -24,6 +24,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
   @override
   void initState() {
     super.initState();
+    // Menginisialisasi input teks dengan alamat saat ini (dikosongkan jika nilainya masih 'Ambil Di Toko')
     _addressController = TextEditingController(text: widget.currentAddress == "Ambil Di Toko" ? "" : widget.currentAddress);
   }
 
@@ -33,6 +34,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
     super.dispose();
   }
 
+  // Menyimpan alamat pengiriman baru ke server/API backend
   Future<void> _saveAddress() async {
     final address = _addressController.text.trim();
     if (address.isEmpty) {
@@ -46,6 +48,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
 
     try {
       final token = Provider.of<AuthProvider>(context, listen: false).token;
+      // Mengirim PUT request ke backend untuk meng-update field address user
       final response = await http.put(
         Uri.parse(ApiService.profile),
         headers: {
@@ -59,6 +62,8 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
 
       if (response.statusCode == 200) {
         if (!mounted) return;
+        // Memperbarui cache alamat di AuthProvider lokal agar sinkron
+        Provider.of<AuthProvider>(context, listen: false).updateProfileData(address: address);
         PremiumSnackbar.showSuccess(context, "Alamat berhasil disimpan");
         Navigator.pop(context, address);
       } else {
