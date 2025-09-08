@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 
+// Layar statis Syarat & Ketentuan aplikasi Roti 515
 class TermsConditionsScreen extends StatelessWidget {
   const TermsConditionsScreen({super.key});
 

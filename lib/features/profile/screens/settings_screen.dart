@@ -13,12 +13,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // State untuk dummy settings
-  bool _promoNotification = true;
+  // State untuk menyimpan preferensi notifikasi secara lokal di UI
   bool _orderNotification = true;
 
   @override
   Widget build(BuildContext context) {
+    // Mengambil status tema aktif (Mode Gelap/Terang) dari ThemeProvider
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: context.colors.bgColor,
@@ -31,14 +31,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSectionLabel("Notifikasi"),
             _buildSettingCard(
               children: [
-                _buildSwitchTile(
-                  icon: Icons.local_offer_outlined,
-                  title: "Notifikasi Promo",
-                  subtitle: "Info diskon dan penawaran spesial",
-                  value: _promoNotification,
-                  onChanged: (val) => setState(() => _promoNotification = val),
-                ),
-                _buildDivider(),
                 _buildSwitchTile(
                   icon: Icons.receipt_long_outlined,
                   title: "Notifikasi Pesanan",
@@ -100,6 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  // Membangun AppBar atas dengan tombol kembali ke halaman profil
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       backgroundColor: context.colors.bgColor.withValues(alpha: 0.95),
@@ -182,6 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  // Widget pembangun item menu dengan tombol Switch (misal untuk toggle Notifikasi & Mode Gelap)
   Widget _buildSwitchTile({
     required IconData icon,
     required String title,
@@ -240,6 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  // Widget pembangun item menu navigasi (membuka halaman Kebijakan Privasi / Syarat Ketentuan)
   Widget _buildNavigationTile({
     required IconData icon,
     required String title,

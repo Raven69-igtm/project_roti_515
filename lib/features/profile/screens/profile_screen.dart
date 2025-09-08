@@ -20,9 +20,6 @@ import '../../../presentation/pages/profile/edit_profile_page.dart'; // Halaman 
 import '../../auth/providers/auth_provider.dart'; // Provider untuk akses token & data user login
 import '../../../core/network/api_service.dart'; // Service pusat untuk URL/Endpoint API
 import '../../../presentation/pages/profile/order_history_page.dart'; // Halaman riwayat pesanan pelanggan
-import 'package:image_picker/image_picker.dart'; // Paket untuk memilih gambar
-import '../../../core/utils/premium_snackbar.dart'; // Utilitas untuk notifikasi snackbar
-import 'package:http_parser/http_parser.dart';
 import 'package:roti_515/core/theme/app_theme.dart'; // Untuk menentukan media type file upload
 
 /// Layar utama Profil Pengguna.
@@ -75,11 +72,24 @@ class _ProfilePageState extends State<ProfilePage> {
         // Memastikan widget masih aktif (tidak di-close oleh user saat loading) sebelum update UI
         if (mounted) {
           final user = data['user'];
-          // Update global photoUrl di AuthProvider agar AppBar sinkron
-          Provider.of<AuthProvider>(
+          final authProvider = Provider.of<AuthProvider>(
             context,
             listen: false,
-          ).updatePhotoUrl(user['photo_url']);
+          );
+          // Update global photoUrl di AuthProvider agar AppBar sinkron
+          authProvider.updatePhotoUrl(user['photo_url']);
+
+          // Inject data lokal (address/name/phone) karena API mungkin tidak menyimpannya
+          if (authProvider.address != null &&
+              authProvider.address!.isNotEmpty) {
+            user['address'] = authProvider.address;
+          }
+          if (authProvider.name != null && authProvider.name!.isNotEmpty) {
+            user['name'] = authProvider.name;
+          }
+          if (authProvider.phone != null && authProvider.phone!.isNotEmpty) {
+            user['phone'] = authProvider.phone;
+          }
 
           setState(() {
             _userData = user; // Menyimpan data 'user' ke variable lokal
@@ -94,69 +104,6 @@ class _ProfilePageState extends State<ProfilePage> {
       // Menangani error jika terjadi kesalahan koneksi internet atau crash saat parsing
       if (mounted) setState(() => _isLoading = false);
       debugPrint("Error fetching profile: $e");
-    }
-  }
-
-  /// Fungsi untuk memilih foto dari galeri dan mengunggahnya ke server.
-  Future<void> _pickAndUploadImage() async {
-    final picker = ImagePicker();
-    // Memilih gambar dari galeri HP
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 90, // Kualitas awal lebih tinggi karena akan di-crop
-    );
-
-    if (image == null) return;
-    if (!mounted) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final token = Provider.of<AuthProvider>(context, listen: false).token;
-
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(ApiService.uploadPhoto),
-      );
-      request.headers['Authorization'] = 'Bearer $token';
-
-      // Gunakan file langsung dari picker
-      final bytes = await image.readAsBytes();
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'photo',
-          bytes,
-          filename: 'profile_photo.jpg',
-          contentType: MediaType('image', 'jpeg'),
-        ),
-      );
-
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
-        if (mounted) {
-          PremiumSnackbar.showSuccess(
-            context,
-            "Foto profil berhasil diperbarui!",
-          );
-          _fetchProfile();
-        }
-      } else {
-        if (mounted) {
-          final data = jsonDecode(response.body);
-          PremiumSnackbar.showError(
-            context,
-            data['error'] ?? "Gagal mengunggah foto",
-          );
-          setState(() => _isLoading = false);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        PremiumSnackbar.showError(context, "Terjadi kesalahan: $e");
-        setState(() => _isLoading = false);
-      }
     }
   }
 
@@ -197,7 +144,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       name: fullName,
                       email: email,
                       photoUrl: _userData?['photo_url'],
-                      onCameraTap: _pickAndUploadImage,
                     ),
 
                     // Memberikan jarak vertikal antar elemen
