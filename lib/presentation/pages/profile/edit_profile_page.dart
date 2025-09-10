@@ -9,6 +9,7 @@ import 'package:http_parser/http_parser.dart';
 // Project Imports
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../core/network/api_service.dart';
+import '../../../core/utils/premium_snackbar.dart';
 import 'package:roti_515/core/theme/app_theme.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -83,24 +84,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _currentPhotoUrl = data['photo_url'];
             _isLoading = false;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Foto profil berhasil diperbarui!"), backgroundColor: Colors.green),
-          );
+          PremiumSnackbar.showSuccess(context, "Foto profil berhasil diperbarui!");
         }
       } else {
         if (mounted) {
           setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Gagal mengunggah foto"), backgroundColor: Colors.red),
-          );
+          PremiumSnackbar.showError(context, "Gagal mengunggah foto");
         }
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
-        );
+        PremiumSnackbar.showError(context, "Error: $e");
       }
     }
   }
@@ -112,15 +107,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (newPassword.isNotEmpty) {
       if (newPassword.length < 6) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Password baru minimal 6 karakter"), backgroundColor: Colors.orange),
-        );
+        PremiumSnackbar.showError(context, "Password baru minimal 6 karakter");
         return;
       }
       if (newPassword != confirmPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Konfirmasi password tidak cocok"), backgroundColor: Colors.red),
-        );
+        PremiumSnackbar.showError(context, "Konfirmasi password tidak cocok");
         return;
       }
     }
@@ -149,23 +140,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       if (response.statusCode == 200) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Profil berhasil diperbarui!"), backgroundColor: Colors.green),
+          // Update local persistence just in case API doesn't hold it properly
+          Provider.of<AuthProvider>(context, listen: false).updateProfileData(
+            name: _nameController.text.trim(),
+            phone: _phoneController.text.trim(),
+            address: _addressController.text.trim(),
           );
+          PremiumSnackbar.showSuccess(context, "Profil berhasil diperbarui!");
           Navigator.pop(context, true);
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Gagal: ${response.body}"), backgroundColor: Colors.red),
-          );
+          PremiumSnackbar.showError(context, "Gagal: ${response.body}");
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
-        );
+        PremiumSnackbar.showError(context, "Error: $e");
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
