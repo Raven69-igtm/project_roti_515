@@ -77,18 +77,18 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
 
     int addedCount = 0;
     for (var item in items) {
-      final food = item['food'];
+      final food = item['food'] ?? item['product'] ?? item['Produk'];
       if (food != null) {
         final product = ProductModel(
           id: food['id'] ?? 0,
-          name: food['name'] ?? 'Product',
+          nama: food['name'] ?? 'Produk',
           description: food['description'] ?? '',
-          price: (item['price'] ?? 0).toInt(),
-          imageUrl: food['image_url'] ?? '',
+          harga: (item['price'] ?? 0).toDouble(),
+          gambar: food['image_url'] ?? '',
           rating: (food['rating'] as num?)?.toDouble() ?? 0.0,
           category: food['category'] ?? '',
           isBestseller: food['is_bestseller'] ?? false,
-          stock: food['stock'] ?? 99,
+          stok: food['stock'] ?? 99,
           soldCount: food['sold_count'] ?? 0,
         );
 
@@ -167,6 +167,82 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         messenger.showSnackBar(
           SnackBar(
             content: Text("Gagal membatalkan pesanan. Coba lagi."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  // ─── KONFIRMASI PENGAMBILAN ──────────────────────────────────
+  Future<void> _confirmPickup(dynamic order) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: context.colors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: Text(
+          "Konfirmasi Pengambilan?",
+          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold, color: context.colors.textDark),
+        ),
+        content: Text(
+          "Apakah Anda yakin ingin mengonfirmasi bahwa Anda sudah mengambil pesanan #${order['order_ref'] ?? order['id']}?",
+          style: GoogleFonts.plusJakartaSans(color: context.colors.textGrey),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text("Batal", style: GoogleFonts.plusJakartaSans(color: context.colors.textGrey, fontWeight: FontWeight.w600)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.colors.success,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text("Ya, Sudah Ambil", style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final response = await http.put(
+        Uri.parse(ApiService.confirmOrderPickupById(order['id'])),
+        headers: {
+          "Authorization": "Bearer ${auth.token}",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text("Pesanan berhasil dikonfirmasi pengambilan"),
+            backgroundColor: context.colors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+        _fetchOrders(); // Refresh list
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text("Gagal mengonfirmasi pengambilan. Coba lagi."),
             backgroundColor: Colors.red,
           ),
         );
@@ -282,7 +358,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
       if (response.statusCode == 200) {
         // Filter lokal hanya yang MASIH AKTIF (pending/processing)
         setState(() {
-          _orders.removeWhere((o) => ['completed', 'done', 'cancelled'].contains(o['status']?.toString().toLowerCase()));
+          _orders.removeWhere((o) => ['completed', 'done', 'completed_unconfirmed', 'cancelled'].contains(o['status']?.toString().toLowerCase()));
           _isLoading = false;
         });
         messenger.showSnackBar(
@@ -309,7 +385,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     final items = order['items'] as List;
     if (items.isEmpty) return;
 
-    final food = items.first['food'];
+    final food = items.first['food'] ?? items.first['product'] ?? items.first['Produk'];
     final int foodId = food?['id'] ?? 0;
 
     await showModalBottomSheet(
@@ -400,7 +476,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               color: context.colors.textDark,
             ),
           ),
-          if (_orders.any((o) => ['completed', 'done', 'cancelled'].contains(o['status']?.toString().toLowerCase())))
+          if (_orders.any((o) => ['completed', 'done', 'completed_unconfirmed', 'cancelled'].contains(o['status']?.toString().toLowerCase())))
             IconButton(
               onPressed: _showDeleteAllConfirmation,
               icon: Icon(Icons.delete_sweep_outlined, color: Colors.redAccent),
@@ -440,7 +516,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     final items = order['items'] as List;
     final String status = (order['status'] ?? 'Pending');
     final String id = order['id']?.toString() ?? '0';
-    final String orderRef = order['order_ref'] ?? '#ROTI515-$id';
+    final String orderRef = (order['order_ref'] != null && order['order_ref'].toString().isNotEmpty) ? order['order_ref'] : '#ROTI515-$id';
     final String date = order['created_at']?.toString().substring(0, 10) ?? '-';
     final double total = (order['total'] ?? 0).toDouble();
     final bool hasRated = order['has_rated'] == true;
@@ -448,7 +524,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     // Summary text
     String summary = "${items.length} item: ";
     if (items.isNotEmpty) {
-      summary += "${items.first['food']?['name'] ?? ''}";
+      summary += "${(items.first['food'] ?? items.first['product'] ?? items.first['Produk'])?['name'] ?? ''}";
     }
 
     // Status Badge Colors
@@ -463,6 +539,11 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         badgeBg = Color(0xFFDCFCE7);
         badgeText = Color(0xFF15803D);
         statusLabel = "Selesai";
+        break;
+      case 'completed_unconfirmed':
+        badgeBg = Color(0xFFFEF9C3);
+        badgeText = Color(0xFFA16207);
+        statusLabel = "Belum Konfirmasi Pengambilan";
         break;
       case 'processing':
         badgeBg = Color(0xFFFEF9C3);
@@ -521,18 +602,22 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                           ),
                         ),
                         SizedBox(width: 8),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: badgeBg,
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: Text(
-                            statusLabel,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: badgeText,
+                        Flexible(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: badgeBg,
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                            child: Text(
+                              statusLabel,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: badgeText,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         ),
@@ -553,7 +638,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                 borderRadius: BorderRadius.circular(32),
                 child: items.isNotEmpty
                     ? Image.network(
-                        ApiService.getDisplayImage(items.first['food']?['image_url']),
+                        ApiService.getDisplayImage((items.first['food'] ?? items.first['product'] ?? items.first['Produk'])?['image_url']),
                         width: 56, height: 56, fit: BoxFit.cover,
                         errorBuilder: (context, error, stack) =>
                             Container(width: 56, height: 56, color: Colors.grey.shade100),
@@ -603,14 +688,23 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                     // Tombol Detail (selalu ada)
                     _buildSecondaryButton(
                       "Detail",
-                      () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => OrderDetailPage(order: order)),
-                      ),
+                      () async {
+                        final result = await Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => OrderDetailPage(order: order)),
+                        );
+                        if (result == true && mounted) {
+                          _fetchOrders();
+                        }
+                      },
                     ),
 
                     // Tombol Batalkan — hanya untuk pesanan pending
                     if (isPending)
                       _buildDangerButton("Batalkan", () => _cancelOrder(order)),
+
+                    // Tombol Konfirmasi Ambil — hanya jika completed_unconfirmed
+                    if (status.toLowerCase() == 'completed_unconfirmed')
+                      _buildPrimaryButton("Konfirmasi Ambil", () => _confirmPickup(order)),
 
                     // Tombol Pesan Lagi — hanya jika selesai
                     if (isCompleted)
@@ -621,7 +715,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                       _buildRatingButton(() => _showRatingDialog(order)),
 
                     // Tombol Hapus — untuk pesanan selesai atau dibatalkan
-                    if (isCompleted || isCancelled)
+                    if (isCompleted || isCancelled || status.toLowerCase() == 'completed_unconfirmed')
                       _buildIconButton(Icons.delete_outline_rounded, Colors.red.shade300,
                           () => _deleteOrder(order)),
                   ],
@@ -760,3 +854,4 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     );
   }
 }
+

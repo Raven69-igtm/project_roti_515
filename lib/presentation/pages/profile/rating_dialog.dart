@@ -37,6 +37,8 @@ class _RatingDialogState extends State<RatingDialog> {
   }
 
   Future<void> _submitRating() async {
+    if (_isSubmitting || _submitted) return; // Proteksi ganda dari sisi state
+
     if (_selectedRating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
