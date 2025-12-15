@@ -1,0 +1,235 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="1">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ===================== BACKGROUND ===================== -->
+    <mxCell id="bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0d1117;strokeColor=none;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="0" y="0" width="1654" height="1169" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== TITLE ===================== -->
+    <mxCell id="title" value="🏪 Alur Sistem Aplikasi B2B — UMKM &amp; Reseller Platform" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#00E5FF;" vertex="1" parent="1">
+      <mxGeometry x="200" y="20" width="1254" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== START: PENGGUNA / VISITOR ===================== -->
+    <mxCell id="visitor" value="👤 Pengguna / Visitor" style="ellipse;whiteSpace=wrap;html=1;fillColor=#00BCD4;strokeColor=#00E5FF;fontColor=#ffffff;fontSize=14;fontStyle=1;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="627" y="90" width="200" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== REGISTER / LOGIN ===================== -->
+    <mxCell id="login" value="🔐 Register / Login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#42A5F5;fontColor=#ffffff;fontSize=13;fontStyle=1;arcSize=20;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="627" y="200" width="200" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== DECISION: CEK PERAN ===================== -->
+    <mxCell id="cek_peran" value="Pengecekan Peran (Role)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#6A1B9A;strokeColor=#CE93D8;fontColor=#ffffff;fontSize=13;fontStyle=1;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="577" y="305" width="300" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== ARROWS: START FLOW ===================== -->
+    <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#00E5FF;fontColor=#ffffff;fontSize=11;" edge="1" source="visitor" target="login" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#42A5F5;fontColor=#ffffff;fontSize=11;" edge="1" source="login" target="cek_peran" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== BRANCH LABEL: UMKM ===================== -->
+    <mxCell id="lbl_umkm" value="ROLE: UMKM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=3;fontColor=#FF9800;" vertex="1" parent="1">
+      <mxGeometry x="310" y="330" width="110" height="30" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== BRANCH LABEL: RESELLER ===================== -->
+    <mxCell id="lbl_reseller" value="ROLE: RESELLER" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=3;fontColor=#42A5F5;" vertex="1" parent="1">
+      <mxGeometry x="1040" y="330" width="130" height="30" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== UMKM BRANCH ===================== -->
+
+    <!-- FORM TAMBAH PRODUK -->
+    <mxCell id="form_produk" value="📝 Form Tambah Produk&#xa;Input Nama · Harga · Stok" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#FF9800;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="130" y="440" width="220" height="65" as="geometry" />
+    </mxCell>
+
+    <!-- GENERATIVE ENGINE CONTAINER -->
+    <mxCell id="gen_engine_bg" value="🌟 GENERATIVE ENGINE" style="swimlane;startSize=35;fillColor=#1B1000;strokeColor=#FFD600;fontColor=#FFD600;fontSize=14;fontStyle=1;rounded=1;arcSize=8;shadow=1;swimlaneLine=1;" vertex="1" parent="1">
+      <mxGeometry x="60" y="560" width="360" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- GEN: TEKS -->
+    <mxCell id="gen_teks" value="📝 Teks: Gemini API&#xa;Deskripsi SEO Otomatis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#33280A;strokeColor=#FFCA28;fontColor=#FFE082;fontSize=11;arcSize=20;shadow=1;" vertex="1" parent="gen_engine_bg">
+      <mxGeometry x="15" y="45" width="150" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- GEN: FOTO -->
+    <mxCell id="gen_foto" value="📸 Foto: Image Studio&#xa;Pollinations AI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#33280A;strokeColor=#FFCA28;fontColor=#FFE082;fontSize=11;arcSize=20;shadow=1;" vertex="1" parent="gen_engine_bg">
+      <mxGeometry x="195" y="45" width="150" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- GEN: VIDEO -->
+    <mxCell id="gen_video" value="🎬 Video: Video Promo&#xa;Fal.ai / FFmpeg" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#33280A;strokeColor=#FFCA28;fontColor=#FFE082;fontSize=11;arcSize=20;shadow=1;" vertex="1" parent="gen_engine_bg">
+      <mxGeometry x="105" y="120" width="150" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- KATALOG PRODUK / DATABASE -->
+    <mxCell id="katalog_db" value="💾 Katalog Produk Teroptimasi&#xa;Tersimpan di Database" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#1B5E20;strokeColor=#66BB6A;fontColor=#ffffff;fontSize=12;fontStyle=1;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="130" y="810" width="220" height="75" as="geometry" />
+    </mxCell>
+
+    <!-- ARROWS: UMKM BRANCH -->
+    <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#FF9800;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cek_peran" target="form_produk" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="460" y="345" />
+          <mxPoint x="240" y="345" />
+          <mxPoint x="240" y="440" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#FF9800;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="form_produk" target="gen_engine_bg" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#FFD600;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="gen_engine_bg" target="katalog_db" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== RESELLER BRANCH ===================== -->
+
+    <!-- DASHBOARD TREN -->
+    <mxCell id="dashboard_tren" value="📊 Dashboard Tren &amp; Grafik&#xa;Produk yang Sedang Laku" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D47A1;strokeColor=#42A5F5;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=15;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="1110" y="440" width="230" height="65" as="geometry" />
+    </mxCell>
+
+    <!-- CARI PRODUK & SUPPLIER -->
+    <mxCell id="cari_produk" value="🔍 Cari Produk &amp; Supplier&#xa;Filter berdasarkan Wilayah / Kategori" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0A2744;strokeColor=#42A5F5;fontColor=#90CAF9;fontSize=11;arcSize=15;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="1100" y="560" width="250" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ANALISIS MARGIN -->
+    <mxCell id="analisis_margin" value="💹 Analisis Margin Keuntungan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0A2744;strokeColor=#42A5F5;fontColor=#90CAF9;fontSize=11;arcSize=15;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="1110" y="670" width="230" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- DROP KIT CONTAINER -->
+    <mxCell id="drop_kit_bg" value="📦 Ambil Jualan / Drop Kit" style="swimlane;startSize=35;fillColor=#1A0030;strokeColor=#CE93D8;fontColor=#CE93D8;fontSize=13;fontStyle=1;rounded=1;arcSize=8;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="1040" y="780" width="370" height="180" as="geometry" />
+    </mxCell>
+
+    <!-- DROP: DESKRIPSI -->
+    <mxCell id="drop_desc" value="⬇️ Download&#xa;Deskripsi AI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2D0050;strokeColor=#9C27B0;fontColor=#E1BEE7;fontSize=10;arcSize=20;shadow=1;" vertex="1" parent="drop_kit_bg">
+      <mxGeometry x="15" y="50" width="100" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- DROP: FOTO -->
+    <mxCell id="drop_foto" value="⬇️ Download&#xa;Foto Estetik AI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2D0050;strokeColor=#9C27B0;fontColor=#E1BEE7;fontSize=10;arcSize=20;shadow=1;" vertex="1" parent="drop_kit_bg">
+      <mxGeometry x="135" y="50" width="100" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- DROP: VIDEO -->
+    <mxCell id="drop_video" value="⬇️ Download Video&#xa;TikTok / Reels AI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2D0050;strokeColor=#9C27B0;fontColor=#E1BEE7;fontSize=10;arcSize=20;shadow=1;" vertex="1" parent="drop_kit_bg">
+      <mxGeometry x="255" y="50" width="100" height="55" as="geometry" />
+    </mxCell>
+
+    <!-- ARROWS: RESELLER BRANCH -->
+    <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#42A5F5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cek_peran" target="dashboard_tren" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="994" y="345" />
+          <mxPoint x="1225" y="345" />
+          <mxPoint x="1225" y="440" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#42A5F5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="dashboard_tren" target="cari_produk" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#42A5F5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="cari_produk" target="analisis_margin" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#9C27B0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="analisis_margin" target="drop_kit_bg" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== SINKRONISASI B2B ===================== -->
+    <mxCell id="sinkronisasi" value="🔄 Sinkronisasi B2B&#xa;Reseller Jualan di Sosmed/Pasar → Stok UMKM Terupdate Otomatis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#004D40;strokeColor=#26A69A;fontColor=#ffffff;fontSize=12;fontStyle=1;arcSize=10;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="490" y="1010" width="480" height="65" as="geometry" />
+    </mxCell>
+
+    <!-- ARROWS: MERGE TO SINKRONISASI -->
+    <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#66BB6A;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="katalog_db" target="sinkronisasi" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="240" y="960" />
+          <mxPoint x="240" y="1043" />
+          <mxPoint x="490" y="1043" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#9C27B0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="drop_kit_bg" target="sinkronisasi" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1225" y="970" />
+          <mxPoint x="1225" y="1043" />
+          <mxPoint x="970" y="1043" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ===================== INTERACTIVE DASHBOARD ===================== -->
+    <mxCell id="int_dashboard" value="📊 Interactive Dashboard&#xa;Grafik Penjualan &amp; Analitik Real-time" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D2137;strokeColor=#00E5FF;fontColor=#00E5FF;fontSize=14;fontStyle=1;arcSize=10;shadow=1;strokeWidth=3;" vertex="1" parent="1">
+      <mxGeometry x="490" y="1130" width="480" height="65" as="geometry" />
+    </mxCell>
+
+    <!-- ARROW: SINKRONISASI → DASHBOARD -->
+    <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#26A69A;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="sinkronisasi" target="int_dashboard" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===================== LEGEND ===================== -->
+    <mxCell id="legend_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#111827;strokeColor=#374151;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1430" y="80" width="200" height="280" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_title" value="LEGENDA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="1430" y="90" width="200" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="leg1" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#00BCD4;strokeColor=#00E5FF;" vertex="1" parent="1">
+      <mxGeometry x="1445" y="125" width="20" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg1t" value="Pengguna" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="1475" y="125" width="145" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg2" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#6A1B9A;strokeColor=#CE93D8;" vertex="1" parent="1">
+      <mxGeometry x="1445" y="155" width="20" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg2t" value="Keputusan / Role" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="1475" y="155" width="145" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#FF9800;" vertex="1" parent="1">
+      <mxGeometry x="1445" y="185" width="20" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg3t" value="Alur UMKM" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="1475" y="185" width="145" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D47A1;strokeColor=#42A5F5;" vertex="1" parent="1">
+      <mxGeometry x="1445" y="215" width="20" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg4t" value="Alur Reseller" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="1475" y="215" width="145" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B1000;strokeColor=#FFD600;" vertex="1" parent="1">
+      <mxGeometry x="1445" y="245" width="20" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg5t" value="AI Engine" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="1475" y="245" width="145" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg6" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#1B5E20;strokeColor=#66BB6A;backgroundOutline=1;" vertex="1" parent="1">
+      <mxGeometry x="1445" y="275" width="20" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="leg6t" value="Database / Storage" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="1475" y="275" width="145" height="20" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>
