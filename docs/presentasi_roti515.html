@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roti 515 — Presentasi Proyek | Politeknik Negeri Jember</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy:   #0F2554;
+      --navy2:  #1A3A6E;
+      --blue:   #1E5BBF;
+      --gold:   #C09B30;
+      --gold2:  #E8BE4A;
+      --red:    #C0392B;
+      --green:  #1A7A4A;
+      --text:   #1A1A2E;
+      --body:   #3D3D5C;
+      --muted:  #7A7A9A;
+      --line:   #D8DCE8;
+      --bg:     #FFFFFF;
+      --bg2:    #F5F6FA;
+      --navy-bg:#EEF1F8;
+    }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #E8EAEF;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      color: var(--text);
+    }
+
+    /* ─── SLIDE ENGINE ─── */
+    .deck { width: 100%; height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      transform: translateX(32px);
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .slide.active { opacity: 1; pointer-events: all; transform: translateX(0); }
+    .slide.exit    { opacity: 0; transform: translateX(-32px); }
+
+    /* ─── SLIDE SHELL ─── */
+    .slide-inner {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+    }
+
+    /* ─── LEFT ACCENT STRIP ─── */
+    .strip {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--blue) 60%, var(--gold) 100%);
+      z-index: 5;
+    }
+
+    /* ─── SLIDE HEADER BAND ─── */
+    .s-header {
+      background: #FFFFFF;
+      padding: 0 56px 0 62px;
+      height: 64px;
+      display: flex; align-items: center; gap: 16px;
+      flex-shrink: 0; position: relative; z-index: 3;
+    }
+    .s-header-logo { height: 38px; }
+    .s-header-sep { width: 1px; height: 28px; background: var(--line); }
+    .s-header-jti { height: 30px; opacity: .95; }
+    .s-header-title { font-size: .76rem; font-weight: 600; color: var(--navy); letter-spacing: .03em; }
+    .s-header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+    .s-header-num { font-size: .72rem; color: var(--muted); font-weight: 600; }
+
+    /* ─── TOP GOLD RULE ─── */
+    .gold-bar {
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold2) 50%, var(--gold) 100%);
+      flex-shrink: 0;
+    }
+
+    /* ─── SLIDE BODY ─── */
+    .s-body {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 36px 56px 36px 62px; overflow-y: auto; overflow-x: hidden; position: relative;
+      min-height: 0;
+    }
+    .s-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .s-body::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 3px;
+    }
+    .s-body::-webkit-scrollbar-thumb {
+      background: rgba(15, 37, 84, 0.12);
+      border-radius: 3px;
+    }
+    .s-body::-webkit-scrollbar-thumb:hover {
+      background: rgba(212, 115, 17, 0.3);
+    }
+    .s-body-row { flex: 1; display: flex; gap: 36px; overflow: visible; }
+
+    /* ─── SLIDE FOOTER ─── */
+    .s-footer {
+      height: 36px; background: var(--bg2);
+      border-top: 1px solid var(--line);
+      display: flex; align-items: center;
+      padding: 0 56px 0 62px; flex-shrink: 0;
+    }
+    .s-footer span { font-size: .65rem; color: var(--muted); letter-spacing: .04em; }
+    .s-footer-right { margin-left: auto; display: flex; gap: 4px; align-items: center; }
+    .f-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--line); }
+    .f-dot.on { background: var(--gold); }
+
+    /* ─── WATERMARK ─── */
+    .wm {
+      position: absolute; bottom: 48px; right: 46px;
+      width: 120px; opacity: 0.08;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── TYPOGRAPHY ─── */
+    .label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 8px; display: block;
+    }
+    .title-xl {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem, 4vw, 3.8rem);
+      font-weight: 800; line-height: 1.15; color: var(--navy);
+    }
+    .title-xl em { font-style: italic; color: var(--blue); }
+    .title-lg {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+      font-weight: 700; line-height: 1.2; color: var(--navy);
+    }
+    .title-sm {
+      font-size: .95rem; font-weight: 700; color: var(--navy); line-height: 1.3;
+    }
+    .body-text { font-size: .85rem; line-height: 1.72; color: var(--body); }
+    .muted { font-size: .78rem; color: var(--muted); }
+
+    /* ─── DIVIDER ─── */
+    .rule { width: 44px; height: 3px; background: var(--gold); margin: 10px 0 16px; border-radius: 2px; }
+    .rule-full { width: 100%; height: 1px; background: var(--line); margin: 12px 0; }
+    .rule-c { width: 44px; height: 3px; background: var(--gold); margin: 10px auto 16px; border-radius: 2px; }
+
+    /* ─── SECTION LABEL BOX ─── */
+    .sec-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--navy-bg); border-left: 3px solid var(--navy);
+      padding: 4px 12px; font-size: .7rem; font-weight: 700;
+      color: var(--navy); letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 14px; border-radius: 0 3px 3px 0;
+    }
+
+    /* ─── TABLES ─── */
+    .tbl { width: 100%; border-collapse: collapse; font-size: .8rem; }
+    .tbl thead tr { background: var(--navy); }
+    .tbl thead th { padding: 9px 14px; text-align: left; font-weight: 600; font-size: .73rem; color: #fff; letter-spacing: .04em; }
+    .tbl tbody tr { border-bottom: 1px solid var(--line); }
+    .tbl tbody tr:hover { background: var(--bg2); }
+    .tbl tbody td { padding: 8px 14px; vertical-align: middle; color: var(--body); }
+    .tbl tbody td:first-child { font-weight: 600; color: var(--navy); }
+    .tbl-sm { font-size: .75rem; }
+    .tbl-sm thead th { padding: 7px 12px; font-size: .7rem; }
+    .tbl-sm tbody td { padding: 6px 12px; }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: 6px; padding: 18px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+    .card-navy {
+      background: var(--navy); color: white;
+      border-radius: 6px; padding: 18px 16px;
+    }
+    .card-accent {
+      background: var(--bg); border: 1px solid var(--line);
+      border-left: 4px solid var(--navy); border-radius: 0 6px 6px 0;
+      padding: 16px 16px;
+    }
+    .card-gold {
+      background: var(--bg); border: 1px solid #E8D98A;
+      border-left: 4px solid var(--gold); border-radius: 0 6px 6px 0;
+      padding: 16px 16px;
+    }
+    .card-green {
+      background: #F0FAF5; border: 1px solid #A7D7B8;
+      border-left: 4px solid var(--green); border-radius: 0 6px 6px 0;
+      padding: 16px 16px;
+    }
+    .card h4 { font-size: .85rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
+    .card-navy h4 { color: rgba(255,255,255,.8); }
+    .card p, .card li { font-size: .78rem; color: var(--body); line-height: 1.65; }
+    .card-navy p { color: rgba(255,255,255,.65); }
+
+    /* ─── BADGE ─── */
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 3px; font-size: .67rem; font-weight: 700; letter-spacing: .03em; }
+    .b-navy   { background: var(--navy-bg); color: var(--navy); }
+    .b-blue   { background: #DBEAFE; color: #1E3A8A; }
+    .b-green  { background: #D1FAE5; color: #065F46; }
+    .b-gold   { background: #FEF3C7; color: #78350F; }
+    .b-purple { background: #EDE9FE; color: #4C1D95; }
+    .b-red    { background: #FEE2E2; color: #7F1D1D; }
+    .b-method-get  { background: #D1FAE5; color: #065F46; font-family: monospace; }
+    .b-method-post { background: #DBEAFE; color: #1E3A8A; font-family: monospace; }
+    .b-method-put  { background: #FEF3C7; color: #78350F; font-family: monospace; }
+    .b-method-del  { background: #FEE2E2; color: #7F1D1D; font-family: monospace; }
+
+    /* ─── BULLET LIST ─── */
+    .bl { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .bl li { display: flex; gap: 10px; font-size: .82rem; color: var(--body); line-height: 1.55; }
+    .bl li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 6px; }
+    .bl-sm li { font-size: .76rem; gap: 8px; }
+    .bl-sm li::before { width: 5px; height: 5px; margin-top: 5px; }
+
+    /* ─── GRIDS ─── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; }
+
+    /* ─── STAT / KPI ─── */
+    .kpi { text-align: center; padding: 18px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg2); }
+    .kpi-num { display: block; font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: var(--navy); line-height: 1; }
+    .kpi-lbl { display: block; font-size: .67rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 5px; }
+    .kpi-sep { width: 1px; background: var(--line); }
+
+    /* ─── UML FRAME ─── */
+    .uml-frame {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1;
+    }
+    .uml-frame img {
+      width: 100% !important;
+      height: 0 !important;
+      flex: 1 !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      display: block !important;
+      border-radius: 3px;
+    }
+    .uml-cap {
+      font-size: .67rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 6px;
+      font-style: italic;
+      padding-bottom: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ─── PHONE MOCKUP ─── */
+    .phone { border-radius: 20px; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,.2), 0 0 0 1px rgba(0,0,0,.06); flex-shrink: 0; }
+    .phone img { display: block; width: 100%; }
+
+    /* ─── ARCHITECTURE BOX ─── */
+    .arch-box {
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 14px 12px; background: var(--bg2); text-align: center;
+    }
+    .arch-box-title { font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+    .arch-row { display: flex; flex-direction: column; gap: 6px; }
+    .arch-item { background: white; border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; font-size: .73rem; font-weight: 600; color: var(--navy); }
+    .arch-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+    .arch-arrow-lbl { font-size: .58rem; color: var(--muted); text-align: center; }
+    .arch-arrow-icon { font-size: 1rem; color: var(--gold); }
+
+    /* ─── COL PANEL ─── */
+    .col-left { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .col-right { flex-shrink: 0; display: flex; flex-direction: column; }
+
+    /* ─── COVER DECORATIONS ─── */
+    .cover-accent {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 340px;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%);
+      z-index: 1;
+    }
+    .cover-accent-pattern {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 340px;
+      z-index: 2; overflow: hidden;
+    }
+    .cover-stripe { position: absolute; background: rgba(255,255,255,.04); }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gold); transition: width .4s; z-index: 1000; }
+
+    /* ─── NAV ─── */
+    .nav {
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px;
+      background: var(--navy); border-radius: 6px; padding: 7px 16px;
+      z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,.25);
+    }
+    .nav-btn { background: transparent; border: none; color: rgba(255,255,255,.45); cursor: pointer; padding: 5px 11px; border-radius: 3px; font-size: 15px; transition: all .2s; }
+    .nav-btn:hover { background: rgba(255,255,255,.12); color: white; }
+    .nav-counter { font-size: .73rem; color: rgba(255,255,255,.38); min-width: 44px; text-align: center; }
+    .nav-dots { display: flex; gap: 4px; }
+    .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.2); cursor: pointer; transition: all .25s; }
+    .nav-dot.on { width: 16px; background: var(--gold2); border-radius: 3px; }
+
+    .hint { position: fixed; top: 12px; right: 18px; font-size: .65rem; color: rgba(0,0,0,.2); z-index: 100; }
+
+    /* ─── HELPERS ─── */
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .flex-col { display: flex; flex-direction: column; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
+    .w-full { width: 100%; }
+    .flex-1 { flex: 1; }
+    .min-0 { min-height: 0; }
+    .align-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .text-center { text-align: center; }
+
+    /* ─── TOC ITEM ─── */
+    .toc-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg2); }
+    .toc-num { width: 26px; height: 26px; background: var(--navy); color: var(--gold2); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 800; flex-shrink: 0; }
+    .toc-item h4 { font-size: .82rem; font-weight: 600; color: var(--navy); }
+    .toc-item p  { font-size: .72rem; color: var(--muted); margin-top: 1px; }
+
+    /* ─── TEAM CARD ─── */
+    .team-card { border: 1px solid var(--line); border-radius: 6px; padding: 18px 14px; text-align: center; background: var(--bg); }
+    .team-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--navy); color: var(--gold2); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display',serif; font-size: 1.2rem; font-weight: 700; margin: 0 auto 12px; }
+    .team-card h4 { font-size: .85rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+    .team-card p  { font-size: .73rem; color: var(--muted); line-height: 1.5; margin-top: 8px; }
+
+    /* ─── INFO ROW ─── */
+    .info-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { font-size: .75rem; font-weight: 600; color: var(--muted); min-width: 140px; }
+    .info-val { font-size: .78rem; color: var(--navy); font-weight: 500; }
+
+    /* ─── PAGE TITLE BLOCK ─── */
+    .page-title { margin-bottom: 18px; }
+
+    /* Mockup stack (Light theme) */
+    .mockup-stack {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      height: 380px;
+    }
+    .mockup {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 45px rgba(15, 37, 84, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      transition: transform 0.4s ease;
+    }
+    .mockup img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .mockup-center {
+      width: 150px; height: 310px;
+      position: relative; z-index: 3;
+    }
+    .mockup-left {
+      width: 120px; height: 250px;
+      position: absolute;
+      left: 10%; bottom: 0; z-index: 1;
+      transform: rotate(-7deg) translateY(10px);
+      opacity: 0.85;
+    }
+    .mockup-right {
+      width: 120px; height: 250px;
+      position: absolute;
+      right: 10%; bottom: 0; z-index: 1;
+      transform: rotate(7deg) translateY(10px);
+      opacity: 0.85;
+    }
+
+    /* ─── PRINT / PDF EXPORT STYLES ─── */
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
+    @media print {
+      html, body {
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        background: #FFFFFF !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .progress, .hint, .nav {
+        display: none !important;
+      }
+      .deck {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+        overflow: visible !important;
+      }
+      .slide {
+        position: relative !important;
+        inset: auto !important;
+        width: 100% !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        opacity: 1 !important;
+        pointer-events: all !important;
+        transform: none !important;
+        display: block !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        overflow: hidden !important;
+        background: #FFFFFF !important;
+      }
+      .slide-inner {
+        position: relative !important;
+        inset: auto !important;
+        width: 100% !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+      }
+      .s-body {
+        height: calc(100vh - 120px) !important;
+        overflow: hidden !important;
+        padding: 24px 56px 24px 62px !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .s-body-row {
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+      }
+      .uml-frame {
+        max-height: 50vh !important;
+        flex: 1 !important;
+        min-width: 0 !important;
+      }
+      .uml-frame img {
+        width: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: 42vh !important;
+        object-fit: contain !important;
+        margin: 0 auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<div class="hint">&#8592; &#8594; untuk navigasi</div>
+
+<div class="deck" id="deck">
+
+
+<!-- ══════════════════════════
+  SLIDE 01 — COVER
+══════════════════════════ -->
+<div class="slide active" id="s0">
+  <div class="slide-inner">
+    <div class="s-header" style="z-index:10;">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Politeknik Negeri Jember</span>
+      <div class="s-header-right"><span class="s-header-num">01 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="s-body" style="padding-top:24px;">
+      <div class="s-body-row" style="align-items: center;">
+        <div class="col-left" style="justify-content: center; gap: 8px;">
+          <!-- Badge -->
+          <div style="display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; background: var(--navy-bg); border: 1px solid var(--line); border-radius: 50px; padding: 6px 14px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; color: var(--navy); text-transform: uppercase; margin-bottom: 8px;">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: #D47311; box-shadow: 0 0 8px #D47311;"></span>
+            ROTI 515 &middot; NGANJUK
+          </div>
+
+          <h1 style="color: var(--navy); font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-size: clamp(1.8rem, 3.4vw, 2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin-bottom: 4px;">
+            Sistem Pemesanan<br>Roti Online
+          </h1>
+          <h2 style="font-family: 'Playfair Display', 'Lora', serif; font-style: italic; font-weight: 700; font-size: clamp(1.4rem, 2.4vw, 2.2rem); color: #D47311; margin-bottom: 12px;">
+            &ldquo;Roti 515&rdquo;
+          </h2>
+          <p style="font-size: .82rem; line-height: 1.6; color: var(--body); max-width: 480px; margin-bottom: 20px;">
+            Aplikasi pemesanan roti artisan berbasis Flutter untuk mendukung transformasi digital UMKM bakery lokal di Nganjuk, dengan backend Golang dan database MySQL.
+          </p>
+
+          <!-- Stats Row -->
+          <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px;">
+            <div style="text-align:center;">
+              <span style="display:block; font-size:1.4rem; font-weight:800; color:#D47311; line-height:1;">v1.0</span>
+              <span style="font-size:0.65rem; color:var(--muted); font-weight:500; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px; display:block;">Release</span>
+            </div>
+            <div style="width:1px; height:28px; background:var(--line);"></div>
+            <div style="text-align:center;">
+              <span style="display:block; font-size:1.4rem; font-weight:800; color:#D47311; line-height:1;">4</span>
+              <span style="font-size:0.65rem; color:var(--muted); font-weight:500; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px; display:block;">Anggota</span>
+            </div>
+            <div style="width:1px; height:28px; background:var(--line);"></div>
+            <div style="text-align:center;">
+              <span style="display:block; font-size:1.4rem; font-weight:800; color:#D47311; line-height:1;">2</span>
+              <span style="font-size:0.65rem; color:var(--muted); font-weight:500; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px; display:block;">Platform</span>
+            </div>
+            <div style="width:1px; height:28px; background:var(--line);"></div>
+            <div style="text-align:center;">
+              <span style="display:block; font-size:1.4rem; font-weight:800; color:#D47311; line-height:1;">7+</span>
+              <span style="font-size:0.65rem; color:var(--muted); font-weight:500; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px; display:block;">Produk</span>
+            </div>
+          </div>
+
+          <!-- Disusun Oleh -->
+          <div style="border:1px solid var(--line); border-radius:10px; padding:12px 16px; background:var(--bg2); max-width: 480px;">
+            <div style="font-size:.6rem; font-weight:700; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px;">Disusun Oleh &mdash; Kelompok Roti 515</div>
+            <div style="font-size:.76rem; font-weight:700; color:var(--navy);">M. Rafi Abiyyuza &nbsp;&middot;&nbsp; Putra Suis Ardiansyah &nbsp;&middot;&nbsp; Aqilla Nur Aisyah W. &nbsp;&middot;&nbsp; Dimas Raditya Nugraha</div>
+            <div style="font-size:.65rem; color:var(--muted); margin-top:4px;">PSDKU Teknik Informatika Nganjuk &mdash; Politeknik Negeri Jember</div>
+          </div>
+        </div>
+
+        <div class="col-right" style="width: 380px; display: flex; align-items: center; justify-content: center; position: relative;">
+          <div class="mockup-stack">
+            <!-- Back-left phone -->
+            <div class="mockup mockup-left">
+              <img src="produk_pelanggan.png" alt="Katalog Produk">
+            </div>
+            <!-- Center main phone -->
+            <div class="mockup mockup-center">
+              <img src="home.png" alt="Beranda Aplikasi">
+            </div>
+            <!-- Back-right phone -->
+            <div class="mockup mockup-right">
+              <img src="dashboard_admin.png" alt="Dashboard Admin">
+            </div>
+
+            <!-- Floating notification -->
+            <div style="position: absolute; bottom: 10px; right: -10px; background: #FFFFFF; border-radius: 12px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10; min-width: 170px; border: 1px solid var(--line);">
+              <div style="background: #D47311; color: #FFFFFF; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-weight: 700;">
+                ✓
+              </div>
+              <div style="text-align: left;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">Pesanan Berhasil!</div>
+                <div style="font-size: 0.65rem; color: #9CA3AF;">Sedang diproses &middot; baru saja</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="s-footer">
+      <span>Politeknik Negeri Jember &mdash; PSDKU Teknik Informatika Nganjuk &mdash; 2026</span>
+      <div class="s-footer-right"><div class="f-dot on"></div><div class="f-dot"></div><div class="f-dot"></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 02 — DAFTAR ISI
+══════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">02 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">Agenda Presentasi</span>
+        <h2 class="title-lg">Daftar Isi</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="g2 flex-1">
+        <div class="flex-col gap-3">
+          <div class="toc-item"><div class="toc-num">01</div><div><h4>Latar Belakang</h4><p>Permasalahan dan motivasi pengembangan</p></div></div>
+          <div class="toc-item"><div class="toc-num">02</div><div><h4>Profil Tim Pengembang</h4><p>Anggota dan pembagian peran</p></div></div>
+          <div class="toc-item"><div class="toc-num">03</div><div><h4>Fitur dan Hak Akses</h4><p>Fungsionalitas sistem per role pengguna</p></div></div>
+          <div class="toc-item"><div class="toc-num">04</div><div><h4>Diagram Use Case</h4><p>Interaksi aktor dengan sistem</p></div></div>
+          <div class="toc-item"><div class="toc-num">05</div><div><h4>Diagram Kelas</h4><p>Struktur entitas dan relasi antar kelas</p></div></div>
+          <div class="toc-item"><div class="toc-num">06</div><div><h4>Diagram Sequence &amp; Activity</h4><p>Alur proses dan interaksi sistem</p></div></div>
+          <div class="toc-item"><div class="toc-num">07</div><div><h4>ERD Konseptual</h4><p>Hubungan logis tingkat tinggi antar entitas data</p></div></div>
+        </div>
+        <div class="flex-col gap-3">
+          <div class="toc-item"><div class="toc-num">08</div><div><h4>Skema Relasional</h4><p>Struktur tabel fisik dan relasi antar tabel</p></div></div>
+          <div class="toc-item"><div class="toc-num">09</div><div><h4>Basis Data / Database</h4><p>Implementasi fisik database MySQL</p></div></div>
+          <div class="toc-item"><div class="toc-num">10</div><div><h4>Arsitektur Sistem</h4><p>Infrastruktur, tech stack, dan endpoint API</p></div></div>
+          <div class="toc-item"><div class="toc-num">11</div><div><h4>Tampilan Aplikasi Customer</h4><p>Screenshot antarmuka pengguna akhir</p></div></div>
+          <div class="toc-item"><div class="toc-num">12</div><div><h4>Tampilan Panel Admin</h4><p>Dashboard dan manajemen data</p></div></div>
+          <div class="toc-item"><div class="toc-num">13</div><div><h4>Teknologi yang Digunakan</h4><p>Stack lengkap dan dependensi utama</p></div></div>
+          <div class="toc-item"><div class="toc-num">14</div><div><h4>Kesimpulan dan Penutup</h4><p>Capaian dan rencana pengembangan lanjutan</p></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 03 — LATAR BELAKANG
+══════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">03 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">01 &mdash; Pendahuluan</span>
+        <h2 class="title-lg">Latar Belakang</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="s-body-row">
+        <div class="col-left">
+          <p class="body-text" style="margin-bottom:18px;">Perkembangan teknologi informasi membuka peluang besar bagi UMKM untuk memperluas jangkauan pasar dan meningkatkan efisiensi operasional secara signifikan.</p>
+          <div class="card-gold" style="margin-bottom:14px;">
+            <div class="title-sm" style="margin-bottom:6px;">Kondisi Terkini Roti 515</div>
+            <p class="body-text" style="font-size:.8rem;">Roti 515 merupakan UMKM bakery lokal di Nganjuk yang selama ini masih mengandalkan pemesanan secara manual melalui tatap muka maupun pesan singkat tanpa sistem yang terstruktur.</p>
+          </div>
+          <div class="flex-col gap-3">
+            <div class="card-accent"><div class="title-sm" style="margin-bottom:6px;">Pemesanan Manual Tidak Terstruktur</div><p class="body-text" style="font-size:.78rem;">Tidak ada konfirmasi otomatis, berisiko miskomunikasi dan kehilangan data pesanan dari pelanggan.</p></div>
+            <div class="card-accent"><div class="title-sm" style="margin-bottom:6px;">Tidak Ada Pencatatan Data yang Sistematis</div><p class="body-text" style="font-size:.78rem;">Admin kesulitan memantau stok, tren penjualan, dan riwayat transaksi secara akurat dan real-time.</p></div>
+          </div>
+        </div>
+        <div class="col-right" style="width:260px;gap:12px;">
+          <div class="card-green">
+            <div class="title-sm" style="margin-bottom:8px;color:var(--green);">Solusi yang Dihadirkan</div>
+            <ul class="bl bl-sm">
+              <li>Aplikasi mobile Android dan Web terintegrasi</li>
+              <li>Pemesanan daring dengan konfirmasi otomatis</li>
+              <li>Notifikasi status pesanan real-time</li>
+              <li>Dashboard manajemen stok dan analitik</li>
+              <li>Backend Golang berkinerja tinggi</li>
+              <li>Database MySQL terstruktur</li>
+            </ul>
+          </div>
+          <div class="card" style="background:var(--navy-bg);border-color:var(--navy);">
+            <div class="title-sm" style="margin-bottom:8px;">Tujuan Pengembangan</div>
+            <ul class="bl bl-sm">
+              <li>Meningkatkan efisiensi operasional UMKM</li>
+              <li>Memperluas jangkauan pelanggan secara digital</li>
+              <li>Menyediakan data analitik bisnis akurat</li>
+              <li>Meningkatkan kredibilitas dan citra toko</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 04 — TIM
+══════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">04 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">02 &mdash; Tim Pengembang</span>
+        <h2 class="title-lg">Profil Tim</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="g4" style="margin-bottom:18px;">
+        <div class="team-card"><div class="team-avatar">RA</div><h4>M. Rafi Abiyyuza</h4><span class="badge b-navy" style="display:inline-block;margin-top:4px;">Project Manager</span><p>Project Management &middot; System Architecture &middot; Cloud Deployment</p></div>
+        <div class="team-card"><div class="team-avatar">PS</div><h4>Putra Suis Ardiansyah</h4><span class="badge b-gold" style="display:inline-block;margin-top:4px;">UI/UX Designer</span><p>UI/UX Design &middot; Prototyping &middot; Visual Identity</p></div>
+        <div class="team-card"><div class="team-avatar">AN</div><h4>Aqilla Nur Aisyah W.</h4><span class="badge b-purple" style="display:inline-block;margin-top:4px;">Programmer</span><p>Flutter Development &middot; Backend Integration &middot; Database Design</p></div>
+        <div class="team-card"><div class="team-avatar">DR</div><h4>Dimas Raditya Nugraha</h4><span class="badge b-blue" style="display:inline-block;margin-top:4px;">Tester</span><p>System Testing &middot; Bug Tracking &middot; Documentation &middot; Laporan</p></div>
+      </div>
+      <div class="rule-full"></div>
+      <div class="g2" style="gap:24px;">
+        <div>
+          <div class="info-row"><span class="info-key">Program Studi</span><span class="info-val">Teknik Informatika (PSDKU Nganjuk)</span></div>
+          <div class="info-row"><span class="info-key">Institusi</span><span class="info-val">Politeknik Negeri Jember</span></div>
+          <div class="info-row"><span class="info-key">Jurusan</span><span class="info-val">Jurusan Teknologi Informasi (JTI)</span></div>
+        </div>
+        <div>
+          <div class="info-row"><span class="info-key">Mata Kuliah</span><span class="info-val">Manajemen Proyek Perangkat Lunak</span></div>
+          <div class="info-row"><span class="info-key">Tahun Akademik</span><span class="info-val">2025 / 2026</span></div>
+          <div class="info-row"><span class="info-key">Versi Rilis</span><span class="info-val">v1.0.0-Stable &nbsp;<span class="badge b-green">Production</span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; PSDKU Teknik Informatika Nganjuk &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 05 — FITUR & HAK AKSES
+══════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">05 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">03 &mdash; Fungsionalitas Sistem</span>
+        <h2 class="title-lg">Fitur dan Hak Akses</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="g2 flex-1" style="gap:24px;">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:white;padding:5px 14px;border-radius:4px;font-size:.73rem;font-weight:700;letter-spacing:.05em;margin-bottom:10px;">ROLE: CUSTOMER</div>
+          <table class="tbl tbl-sm">
+            <thead><tr><th>No.</th><th>Fitur</th><th>Keterangan</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Registrasi dan Login</td><td>Email/password dan Google SSO</td></tr>
+              <tr><td>2</td><td>Katalog Produk</td><td>Jelajahi menu dengan foto dan harga</td></tr>
+              <tr><td>3</td><td>Keranjang Belanja</td><td>Tambah, kurangi, dan hapus item</td></tr>
+              <tr><td>4</td><td>Checkout</td><td>Pilih metode bayar dan jadwal ambil</td></tr>
+              <tr><td>5</td><td>Riwayat Pesanan</td><td>Lacak status dan batalkan pesanan</td></tr>
+              <tr><td>6</td><td>Notifikasi</td><td>Pembaruan status pesanan real-time</td></tr>
+              <tr><td>7</td><td>Profil Pengguna</td><td>Edit data diri, foto, dan alamat</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:white;padding:5px 14px;border-radius:4px;font-size:.73rem;font-weight:700;letter-spacing:.05em;margin-bottom:10px;">ROLE: ADMIN</div>
+          <table class="tbl tbl-sm">
+            <thead><tr><th>No.</th><th>Fitur</th><th>Keterangan</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Dashboard Statistik</td><td>Grafik penjualan dan ringkasan harian</td></tr>
+              <tr><td>2</td><td>Manajemen Produk</td><td>CRUD produk, upload gambar, stok</td></tr>
+              <tr><td>3</td><td>Kelola Pesanan</td><td>Konfirmasi dan ubah status pesanan</td></tr>
+              <tr><td>4</td><td>Manajemen Pengguna</td><td>Lihat dan kelola akun pelanggan</td></tr>
+              <tr><td>5</td><td>Profil Admin</td><td>Edit informasi profil dan toko</td></tr>
+              <tr><td>6</td><td>Indikator Stok Rendah</td><td>Peringatan stok mendekati habis</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 06 — USE CASE
+══════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">06 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">04 &mdash; Pemodelan UML</span>
+        <h2 class="title-lg">Diagram Use Case</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="s-body-row">
+        <div class="uml-frame flex-1 min-0">
+          <img src="uml_usecase.png" alt="Use Case Diagram">
+          <div class="uml-cap">Gambar 1. Use Case Diagram Sistem Roti 515</div>
+        </div>
+        <div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;">
+          <div class="card-accent">
+            <div class="title-sm" style="margin-bottom:8px;">Aktor: Customer</div>
+            <ul class="bl bl-sm"><li>Registrasi dan Login</li><li>Melihat katalog produk</li><li>Melakukan pemesanan</li><li>Melacak status pesanan</li><li>Membatalkan pesanan</li><li>Mengelola profil</li></ul>
+          </div>
+          <div class="card-gold">
+            <div class="title-sm" style="margin-bottom:8px;">Aktor: Admin</div>
+            <ul class="bl bl-sm"><li>Mengelola produk dan stok</li><li>Memproses pesanan</li><li>Melihat statistik</li><li>Mengelola pengguna</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 07 — CLASS DIAGRAM
+══════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">07 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">05 &mdash; Pemodelan UML</span>
+        <h2 class="title-lg">Diagram Kelas</h2>
+        <div class="rule"></div>
+      </div>
+      <p class="body-text" style="margin-bottom:14px;max-width:680px;">Class Diagram menampilkan struktur entitas utama pada sistem, mencakup atribut, metode, dan relasi antar kelas yang membentuk arsitektur perangkat lunak Roti 515.</p>
+      <div class="uml-frame flex-1 min-0">
+        <img src="uml_class.png" alt="Class Diagram">
+        <div class="uml-cap">Gambar 2. Class Diagram Sistem Roti 515</div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 08 — SEQUENCE & ACTIVITY
+══════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">08 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">06 &mdash; Pemodelan UML</span>
+        <h2 class="title-lg">Diagram Sequence &amp; Activity</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="g2 flex-1 min-0" style="gap:20px;">
+        <div class="flex-col flex-1 min-0 gap-3">
+          <div class="uml-frame flex-1 min-0"><img src="uml_sequence.png" alt="Sequence"><div class="uml-cap">Gambar 3. Sequence Diagram &mdash; Alur Pemesanan</div></div>
+          <p class="body-text" style="font-size:.75rem; flex-shrink: 0;">Interaksi berurutan antara Customer, Flutter, Backend Golang, dan database MySQL dalam proses pemesanan.</p>
+        </div>
+        <div class="flex-col flex-1 min-0 gap-3">
+          <div class="uml-frame flex-1 min-0"><img src="uml_activity.png" alt="Activity"><div class="uml-cap">Gambar 4. Activity Diagram &mdash; Alur Proses Sistem</div></div>
+          <p class="body-text" style="font-size:.75rem; flex-shrink: 0;">Alur kerja sistem dari sudut pandang proses bisnis, mulai dari pemesanan hingga penyelesaian transaksi.</p>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 09 — ERD KONSEPTUAL
+══════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">09 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">07 &mdash; Desain Basis Data</span>
+        <h2 class="title-lg">Diagram ERD Konseptual</h2>
+        <div class="rule"></div>
+      </div>
+      <p class="body-text" style="margin-bottom:14px;max-width:680px;">Diagram ERD Konseptual mendefinisikan hubungan logis tingkat tinggi antara entitas utama dalam sistem Roti 515, seperti Pengguna, Produk, Keranjang, Pesanan, dan Detail Pesanan.</p>
+      <div class="uml-frame flex-1 min-0">
+        <img src="erd_konseptual_roti515.png" alt="ERD Konseptual">
+        <div class="uml-cap">Gambar 5. ERD Konseptual Sistem Roti 515</div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 10 — SKEMA RELASIONAL
+══════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">10 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">08 &mdash; Desain Basis Data</span>
+        <h2 class="title-lg">Skema Relasional</h2>
+        <div class="rule"></div>
+      </div>
+      <p class="body-text" style="margin-bottom:14px;max-width:680px;">Skema Relasional memetakan entitas konseptual ke dalam tabel database fisik yang dinormalisasi lengkap dengan tipe data, primary key, dan foreign key untuk menjamin integritas referensial data.</p>
+      <div class="uml-frame flex-1 min-0">
+        <img src="erd_relational_schema_roti515.png" alt="Skema Relasional">
+        <div class="uml-cap">Gambar 6. Skema Relasional Database Roti 515</div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 11 — IMPLEMENTASI DATABASE
+══════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">11 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">09 &mdash; Desain Basis Data</span>
+        <h2 class="title-lg">Implementasi Basis Data (MySQL)</h2>
+        <div class="rule"></div>
+      </div>
+      <p class="body-text" style="margin-bottom:14px;max-width:680px;">Implementasi fisik tabel basis data pada DBMS MySQL yang terstruktur dan terindeks, menyimpan data pengguna, kategori produk, detail transaksi belanja, serta pengelolaan stok.</p>
+      <div class="uml-frame flex-1 min-0">
+        <img src="database_roti515.png" alt="Implementasi Database">
+        <div class="uml-cap">Gambar 7. Struktur Tabel Database MySQL Roti 515</div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 09 — ARSITEKTUR
+══════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">12 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">07 &mdash; Arsitektur Sistem</span>
+        <h2 class="title-lg">Arsitektur Sistem</h2>
+        <div class="rule"></div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;gap:10px;margin-bottom:16px;">
+        <div class="arch-box flex-1"><div class="arch-box-title">Client Layer</div><div class="arch-row"><div class="arch-item">Android APK</div><div class="arch-item">Flutter Web</div></div><div style="margin-top:8px;font-size:.62rem;color:var(--muted);text-align:center;">Flutter 3 &middot; Dart</div></div>
+        <div class="arch-arrow"><div class="arch-arrow-lbl">HTTPS/REST</div><div class="arch-arrow-icon">&rarr;</div></div>
+        <div class="arch-box flex-1" style="border-color:#BFDBFE;background:#EFF6FF;"><div class="arch-box-title" style="color:#1E40AF;border-color:#BFDBFE;">Application Layer</div><div class="arch-row"><div class="arch-item" style="color:#1E40AF;border-color:#BFDBFE;">Go &mdash; Gin/Echo</div><div class="arch-item" style="color:#1E40AF;border-color:#BFDBFE;">JWT Authentication</div><div class="arch-item" style="color:#1E40AF;border-color:#BFDBFE;">Static File Server</div><div class="arch-item" style="color:#1E40AF;border-color:#BFDBFE;">REST API Handler</div></div><div style="margin-top:8px;font-size:.62rem;color:#60A5FA;text-align:center;">Golang &middot; Railway</div></div>
+        <div class="arch-arrow"><div class="arch-arrow-lbl">MySQL Query</div><div class="arch-arrow-icon">&rarr;</div></div>
+        <div class="arch-box flex-1" style="border-color:#A7F3D0;background:#ECFDF5;"><div class="arch-box-title" style="color:#065F46;border-color:#A7F3D0;">Data Layer</div><div class="arch-row"><div class="arch-item" style="color:#065F46;border-color:#A7F3D0;">MySQL 8.x</div><div class="arch-item" style="color:#065F46;border-color:#A7F3D0;">Media Storage</div></div><div style="margin-top:8px;font-size:.62rem;color:#34D399;text-align:center;">Railway Cloud DB</div></div>
+        <div class="arch-arrow"><div class="arch-arrow-lbl">HTTP</div><div class="arch-arrow-icon">&rarr;</div></div>
+        <div class="arch-box flex-1" style="border-color:#E8D98A;background:#FFFBEB;"><div class="arch-box-title" style="color:#78350F;border-color:#E8D98A;">Hosting Layer</div><div class="arch-row"><div class="arch-item" style="color:#78350F;border-color:#E8D98A;">Vercel CDN</div><div class="arch-item" style="color:#78350F;border-color:#E8D98A;">Landing Page</div><div class="arch-item" style="color:#78350F;border-color:#E8D98A;">APK Distribution</div></div><div style="margin-top:8px;font-size:.62rem;color:#D97706;text-align:center;">Global CDN</div></div>
+      </div>
+
+      <div class="sec-tag" style="margin-top:4px;">Daftar Endpoint RESTful API Utama</div>
+      <table class="tbl tbl-sm">
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Go Handler</th><th>Deskripsi</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge b-method-post">POST</span></td><td>/api/login</td><td>AuthHandler.Login</td><td>Autentikasi pengguna, menghasilkan JWT token</td></tr>
+          <tr><td><span class="badge b-method-post">POST</span></td><td>/api/register</td><td>AuthHandler.Register</td><td>Pendaftaran akun pelanggan baru</td></tr>
+          <tr><td><span class="badge b-method-get">GET</span></td><td>/api/foods</td><td>FoodHandler.GetAll</td><td>Mengambil seluruh daftar produk dari MySQL</td></tr>
+          <tr><td><span class="badge b-method-post">POST</span></td><td>/api/orders</td><td>OrderHandler.Create</td><td>Membuat transaksi pesanan baru</td></tr>
+          <tr><td><span class="badge b-method-put">PUT</span></td><td>/api/admin/orders/:id</td><td>AdminHandler.UpdateOrder</td><td>Memperbarui status pesanan oleh admin</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 10 — TAMPILAN CUSTOMER
+══════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">13 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body" style="padding-right:40px;">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">08 &mdash; Antarmuka Pengguna</span>
+        <h2 class="title-lg">Tampilan Aplikasi Customer</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="s-body-row">
+        <div class="col-left" style="gap:14px;">
+          <p class="body-text" style="margin-bottom:8px;">Antarmuka dirancang dengan pendekatan <em>mobile-first</em> menggunakan Flutter Material Design 3, memastikan pengalaman yang intuitif dan responsif.</p>
+          <div class="flex-col gap-3">
+            <div class="card-accent"><div class="title-sm" style="margin-bottom:5px;">Beranda dan Katalog</div><p class="body-text" style="font-size:.77rem;">Produk unggulan, pencarian, dan filter kategori menu.</p></div>
+            <div class="card-accent"><div class="title-sm" style="margin-bottom:5px;">Keranjang dan Checkout</div><p class="body-text" style="font-size:.77rem;">Ringkasan belanja, metode pembayaran, dan jadwal pengambilan.</p></div>
+            <div class="card-accent"><div class="title-sm" style="margin-bottom:5px;">Riwayat dan Notifikasi</div><p class="body-text" style="font-size:.77rem;">Lacak status pesanan secara real-time dan batalkan bila diperlukan.</p></div>
+            <div class="card-accent"><div class="title-sm" style="margin-bottom:5px;">Profil dan Pengaturan</div><p class="body-text" style="font-size:.77rem;">Edit data diri, foto profil, dan manajemen alamat pengiriman.</p></div>
+          </div>
+        </div>
+        <div class="col-right" style="width: 340px; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; margin-left: 20px;">
+          <div class="mockup-stack" style="height: 310px; width: 100%;">
+            <!-- Left phone -->
+            <div class="mockup mockup-left" style="width: 110px; height: 230px; left: 0; bottom: 0; transform: rotate(-6deg) translateY(10px); opacity: 0.85;">
+              <img src="daftar.png" alt="Daftar" style="width: 100%; height: 100%; object-fit: fill;">
+            </div>
+            <!-- Center phone -->
+            <div class="mockup mockup-center" style="width: 135px; height: 285px; position: relative; z-index: 3;">
+              <img src="home.png" alt="Beranda" style="width: 100%; height: 100%; object-fit: fill;">
+            </div>
+            <!-- Right phone -->
+            <div class="mockup mockup-right" style="width: 110px; height: 230px; right: 0; bottom: 0; transform: rotate(6deg) translateY(10px); opacity: 0.85;">
+              <img src="keranjang.png" alt="Keranjang" style="width: 100%; height: 100%; object-fit: fill;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 11 — TAMPILAN ADMIN
+══════════════════════════ -->
+<div class="slide" id="s13">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">14 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body" style="padding-right:40px;">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">09 &mdash; Antarmuka Administrator</span>
+        <h2 class="title-lg">Panel Kontrol Admin</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="s-body-row">
+        <div class="col-right" style="width: 340px; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; margin-right: 20px;">
+          <div class="mockup-stack" style="height: 310px; width: 100%;">
+            <!-- Left phone -->
+            <div class="mockup mockup-left" style="width: 110px; height: 230px; left: 0; bottom: 0; transform: rotate(-6deg) translateY(10px); opacity: 0.85;">
+              <img src="kelola_produk_admin.png" alt="Kelola Produk" style="width: 100%; height: 100%; object-fit: fill;">
+            </div>
+            <!-- Center phone -->
+            <div class="mockup mockup-center" style="width: 135px; height: 285px; position: relative; z-index: 3;">
+              <img src="dashboard_admin.png" alt="Dashboard" style="width: 100%; height: 100%; object-fit: fill;">
+            </div>
+            <!-- Right phone -->
+            <div class="mockup mockup-right" style="width: 110px; height: 230px; right: 0; bottom: 0; transform: rotate(6deg) translateY(10px); opacity: 0.85;">
+              <img src="kelola_akun_admin.png" alt="Kelola Akun" style="width: 100%; height: 100%; object-fit: fill;">
+            </div>
+          </div>
+        </div>
+        <div class="col-left" style="gap:14px;">
+          <p class="body-text" style="margin-bottom:8px;">Panel admin dirancang untuk efisiensi pengelolaan data bisnis secara menyeluruh dalam satu antarmuka terpadu.</p>
+          <div class="flex-col gap-3">
+            <div class="card-gold"><div class="title-sm" style="margin-bottom:5px;">Dashboard Statistik</div><p class="body-text" style="font-size:.77rem;">Grafik penjualan interaktif berbasis fl_chart dan ringkasan statistik harian.</p></div>
+            <div class="card-gold"><div class="title-sm" style="margin-bottom:5px;">Manajemen Produk</div><p class="body-text" style="font-size:.77rem;">Tambah, edit, hapus produk beserta upload gambar dan kelola stok real-time.</p></div>
+            <div class="card-gold"><div class="title-sm" style="margin-bottom:5px;">Pemrosesan Pesanan</div><p class="body-text" style="font-size:.77rem;">Konfirmasi, proses, dan ubah status pesanan pelanggan secara langsung.</p></div>
+            <div class="card-gold"><div class="title-sm" style="margin-bottom:5px;">Manajemen Pengguna</div><p class="body-text" style="font-size:.77rem;">Lihat dan kelola seluruh akun pelanggan yang terdaftar dalam sistem.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 12 — TEKNOLOGI
+══════════════════════════ -->
+<div class="slide" id="s14">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">15 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">10 &mdash; Stack Teknologi</span>
+        <h2 class="title-lg">Teknologi yang Digunakan</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="g2 flex-1" style="gap:20px;">
+        <div class="flex-col gap-3">
+          <table class="tbl tbl-sm">
+            <thead><tr><th>Layer</th><th>Teknologi</th><th>Peran dalam Sistem</th></tr></thead>
+            <tbody>
+              <tr><td>Frontend</td><td>Flutter 3.x + Dart</td><td>Antarmuka cross-platform Android dan Web</td></tr>
+              <tr><td>Backend</td><td>Go (Golang) + Gin/Echo</td><td>RESTful API server berkinerja tinggi</td></tr>
+              <tr><td>Database</td><td>MySQL 8.x</td><td>Penyimpanan data relasional terstruktur</td></tr>
+              <tr><td>Autentikasi</td><td>JWT + Google OAuth 2.0</td><td>Manajemen sesi dan otorisasi pengguna</td></tr>
+              <tr><td>Hosting API</td><td>Railway Cloud</td><td>Deployment server Go dan database MySQL</td></tr>
+              <tr><td>Hosting Web</td><td>Vercel</td><td>Landing page, CDN global, distribusi APK</td></tr>
+            </tbody>
+          </table>
+          <div class="card-green">
+            <div class="title-sm" style="margin-bottom:8px;color:var(--green);">Keunggulan Backend Golang</div>
+            <ul class="bl bl-sm">
+              <li>Performa tinggi dengan model concurrency goroutine</li>
+              <li>Kompilasi ke binary tunggal tanpa runtime tambahan</li>
+              <li>Konsumsi memori sangat efisien dibanding Node.js</li>
+              <li>Strongly typed, meminimalkan runtime error di production</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="sec-tag">Dependensi Flutter Utama</div>
+          <table class="tbl tbl-sm">
+            <thead><tr><th>Package</th><th>Versi</th><th>Fungsi</th></tr></thead>
+            <tbody>
+              <tr><td>provider</td><td>^6.1.5</td><td>State management reaktif</td></tr>
+              <tr><td>http</td><td>^1.6.0</td><td>HTTP request ke REST API Golang</td></tr>
+              <tr><td>fl_chart</td><td>^1.2.0</td><td>Grafik penjualan interaktif pada dashboard</td></tr>
+              <tr><td>google_sign_in</td><td>^6.2.1</td><td>Integrasi autentikasi Google OAuth</td></tr>
+              <tr><td>image_picker</td><td>^1.2.1</td><td>Upload foto produk dan profil pengguna</td></tr>
+              <tr><td>shared_preferences</td><td>^2.5.5</td><td>Penyimpanan lokal JWT token sesi</td></tr>
+              <tr><td>google_fonts</td><td>^8.0.2</td><td>Tipografi premium dari Google Fonts</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+  SLIDE 13 — KESIMPULAN
+══════════════════════════ -->
+<div class="slide" id="s15">
+  <div class="slide-inner">
+    <div class="strip"></div>
+    <div class="s-header">
+      <img src="logo_polije.png" alt="Polije" class="s-header-logo">
+
+      <div class="s-header-sep"></div>
+      <span class="s-header-title">Sistem Pemesanan Roti 515</span>
+      <div class="s-header-right"><span class="s-header-num">16 / 16</span></div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="s-body">
+      <img src="logo_polije.png" class="wm" alt="">
+      <div class="page-title">
+        <span class="label">12 &mdash; Penutup</span>
+        <h2 class="title-lg">Kesimpulan</h2>
+        <div class="rule"></div>
+      </div>
+      <div class="g2 flex-1" style="gap:20px;">
+        <div class="flex-col gap-3">
+          <div class="card-accent">
+            <div class="title-sm" style="margin-bottom:8px;">Capaian Sistem</div>
+            <ul class="bl bl-sm"><li>Aplikasi tersedia di Android (APK) dan Web Browser</li><li>Autentikasi dua role Customer dan Admin berbasis JWT</li><li>Pemesanan dan notifikasi status berjalan secara real-time</li><li>Dashboard admin dengan grafik penjualan interaktif</li><li>Backend Golang di Railway, frontend di Vercel</li><li>Database MySQL terkelola dengan skema relasional terstruktur</li></ul>
+          </div>
+          <div class="card-gold">
+            <div class="title-sm" style="margin-bottom:8px;">Manfaat bagi UMKM Roti 515</div>
+            <ul class="bl bl-sm"><li>Efisiensi proses pemesanan dari manual ke digital</li><li>Data penjualan dan stok tercatat otomatis di MySQL</li><li>Jangkauan pelanggan lebih luas tanpa batasan geografis</li><li>Meningkatkan kredibilitas dan citra profesional toko</li></ul>
+          </div>
+        </div>
+        <div class="flex-col gap-3">
+          <div class="card-green">
+            <div class="title-sm" style="margin-bottom:8px;color:var(--green);">Rencana Pengembangan Lanjutan</div>
+            <ul class="bl bl-sm"><li>Integrasi payment gateway (Midtrans atau DOKU)</li><li>Fitur ulasan dan penilaian produk oleh pelanggan</li><li>Push notification via Firebase Cloud Messaging</li><li>Laporan keuangan dengan ekspor PDF and Excel</li><li>Publikasi ke Google Play Store</li><li>Migrasi ke arsitektur microservice berbasis Go</li></ul>
+          </div>
+          <div style="border:2px solid var(--navy);border-radius:6px;padding:22px;text-align:center;background:var(--navy-bg);flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:14px;">
+              <img src="logo_polije.png" style="height:44px;" alt="Polije">
+              <div style="width:1px;height:32px;background:var(--line);"></div>
+              <img src="app_icon.png" style="height:44px;border-radius:12px;" alt="Roti 515">
+            </div>
+            <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:.95rem;color:var(--navy);font-weight:700;margin-bottom:5px;">&ldquo;Terima kasih atas perhatian Bapak dan Ibu.&rdquo;</p>
+            <p class="muted" style="font-size:.73rem;margin-top:4px;">M. Rafi Abiyyuza &middot; Putra Suis Ardiansyah &middot; Aqilla Nur Aisyah W. &middot; Dimas Raditya Nugraha</p>
+            <p class="muted" style="font-size:.68rem;margin-top:3px;">JTI &mdash; PSDKU Nganjuk &mdash; Politeknik Negeri Jember &mdash; 2026</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="s-footer"><span>Politeknik Negeri Jember &mdash; Jurusan Teknologi Informasi &mdash; 2026</span></div>
+  </div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="btnP">&lsaquo;</button>
+  <div class="nav-dots" id="dots"></div>
+  <span class="nav-counter" id="ctr">1 / 16</span>
+  <button class="nav-btn" id="btnN">&rsaquo;</button>
+</div>
+
+<script>
+  const slides=document.querySelectorAll('.slide');
+  const dots=document.getElementById('dots');
+  const ctr=document.getElementById('ctr');
+  const prog=document.getElementById('prog');
+  let cur=0;
+  slides.forEach((_,i)=>{const d=document.createElement('div');d.className='nav-dot'+(i===0?' on':'');d.addEventListener('click',()=>go(i));dots.appendChild(d);});
+  function go(n){if(n<0||n>=slides.length)return;slides[cur].classList.remove('active');slides[cur].classList.add('exit');const p=cur;setTimeout(()=>slides[p].classList.remove('exit'),420);cur=n;slides[cur].classList.add('active');document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('on',i===cur));ctr.textContent=`${cur+1} / ${slides.length}`;prog.style.width=`${((cur+1)/slides.length)*100}%`;}
+  document.getElementById('btnP').addEventListener('click',()=>go(cur-1));
+  document.getElementById('btnN').addEventListener('click',()=>go(cur+1));
+  document.addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(cur+1);}if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(cur-1);}});
+  let tx=0;document.addEventListener('touchstart',e=>tx=e.changedTouches[0].clientX);document.addEventListener('touchend',e=>{const d=tx-e.changedTouches[0].clientX;if(Math.abs(d)>50)d>0?go(cur+1):go(cur-1);});
+  prog.style.width=`${(1/slides.length)*100}%`;
+</script>
+</body>
+</html>
