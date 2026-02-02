@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile version="21.6.8">
+  <diagram id="erd_tables" name="ERD Database (Logical)">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ENTITIES (TABLES) -->
+        <mxCell id="t_user" value="&lt;b&gt;USER&lt;/b&gt;&lt;hr&gt;&lt;u&gt;id (PK)&lt;/u&gt;&lt;br&gt;nama&lt;br&gt;email&lt;br&gt;password" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="400" y="50" width="160" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_admin" value="&lt;b&gt;ADMIN&lt;/b&gt;&lt;hr&gt;&lt;u&gt;user_id (PK, FK)&lt;/u&gt;&lt;br&gt;level" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="150" y="200" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_pel" value="&lt;b&gt;PELANGGAN&lt;/b&gt;&lt;hr&gt;&lt;u&gt;user_id (PK, FK)&lt;/u&gt;&lt;br&gt;no_hp&lt;br&gt;tgl_daftar" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="400" y="250" width="160" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_ker" value="&lt;b&gt;KERANJANG&lt;/b&gt;&lt;hr&gt;&lt;u&gt;id (PK)&lt;/u&gt;&lt;br&gt;pelanggan_id (FK)" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="700" y="250" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_ki" value="&lt;b&gt;KERANJANG_ITEM&lt;/b&gt;&lt;hr&gt;&lt;u&gt;keranjang_id (PK, FK)&lt;/u&gt;&lt;br&gt;&lt;u&gt;produk_id (PK, FK)&lt;/u&gt;&lt;br&gt;qty" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="700" y="400" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_ord" value="&lt;b&gt;ORDER&lt;/b&gt;&lt;hr&gt;&lt;u&gt;id (PK)&lt;/u&gt;&lt;br&gt;pelanggan_id (FK)&lt;br&gt;status&lt;br&gt;total&lt;br&gt;jam_ambil&lt;br&gt;metode_bayar" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="400" y="450" width="180" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_io" value="&lt;b&gt;ITEM_ORDER&lt;/b&gt;&lt;hr&gt;&lt;u&gt;order_id (PK, FK)&lt;/u&gt;&lt;br&gt;&lt;u&gt;produk_id (PK, FK)&lt;/u&gt;&lt;br&gt;qty&lt;br&gt;harga_satuan" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="400" y="700" width="180" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_prod" value="&lt;b&gt;PRODUK&lt;/b&gt;&lt;hr&gt;&lt;u&gt;id (PK)&lt;/u&gt;&lt;br&gt;nama&lt;br&gt;harga&lt;br&gt;stok&lt;br&gt;gambar" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="600" width="160" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_jad" value="&lt;b&gt;JADWAL_AMBIL&lt;/b&gt;&lt;hr&gt;&lt;u&gt;id (PK)&lt;/u&gt;&lt;br&gt;jam_mulai&lt;br&gt;jam_selesai&lt;br&gt;is_aktif" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="100" y="500" width="160" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- RELATIONSHIPS (EDGES) -->
+        <!-- User to Admin -->
+        <mxCell id="l_u_a" edge="1" parent="1" source="t_user" target="t_admin" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmandOne;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- User to Pelanggan -->
+        <mxCell id="l_u_p" edge="1" parent="1" source="t_user" target="t_pel" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmandOne;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Pelanggan to Keranjang -->
+        <mxCell id="l_p_k" edge="1" parent="1" source="t_pel" target="t_ker" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERzeroToOne;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Keranjang to Keranjang Item (1 to N) -->
+        <mxCell id="l_k_ki" edge="1" parent="1" source="t_ker" target="t_ki" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Produk to Keranjang Item (1 to N) -->
+        <mxCell id="l_pr_ki" edge="1" parent="1" source="t_prod" target="t_ki" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Pelanggan to Order (1 to N) -->
+        <mxCell id="l_p_o" edge="1" parent="1" source="t_pel" target="t_ord" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Order to Item Order (1 to N) -->
+        <mxCell id="l_o_io" edge="1" parent="1" source="t_ord" target="t_io" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Produk to Item Order (1 to N) -->
+        <mxCell id="l_pr_io" edge="1" parent="1" source="t_prod" target="t_io" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;html=1;rounded=0;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
