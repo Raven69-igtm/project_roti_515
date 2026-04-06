@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Unduh aplikasi Roti 515 – pesan roti artisan favorit Anda kapan saja dan di mana saja.">
+    <title>Roti 515 – Pesan Roti Kesukaan Anda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Lora:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ─── NAVBAR ─── -->
+    <header class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a class="logo" href="#">
+                <img src="logo_badge.png" alt="Roti 515" class="logo-img">
+                <span class="logo-text">Roti <span class="logo-accent">515</span></span>
+            </a>
+            <nav class="nav-links" id="nav-links">
+                <a href="#beranda">Beranda</a>
+                <a href="#fitur">Fitur</a>
+                <a href="#download">Unduh</a>
+            </nav>
+            <a href="#download" class="btn-nav-cta">Unduh App</a>
+            <button class="hamburger" id="hamburger" aria-label="Toggle Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ─── HERO ─── -->
+    <section class="hero" id="beranda">
+        <!-- Background image with dark overlay -->
+        <div class="hero-bg">
+            <img src="hero_bg.png" alt="" aria-hidden="true" class="hero-bg-img">
+            <div class="hero-bg-overlay"></div>
+        </div>
+
+        <div class="container hero-container">
+            <!-- LEFT: Text -->
+            <div class="hero-left">
+                <div class="badge">
+                    <span class="badge-dot"></span>
+                    ROTI 515 · NGANJUK
+                </div>
+                <h1 class="hero-title">
+                    Pesan Roti Segar,<br>
+                    <em class="hero-italic">Hangat & Nikmat.</em>
+                </h1>
+                <p class="hero-desc">
+                    Nikmati pengalaman memesan roti artisan pilihan kapan saja dan di mana saja.
+                    Katalog lengkap, checkout mudah, dan pelacakan pesanan real-time.
+                </p>
+                <div class="hero-actions">
+                    <a href="#download" class="btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/></svg>
+                        Unduh Sekarang
+                    </a>
+                    <a href="#fitur" class="btn-ghost">Lihat Fitur →</a>
+                </div>
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat">
+                        <span class="stat-num">7+</span>
+                        <span class="stat-label">Menu Tersedia</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-num">2</span>
+                        <span class="stat-label">Role Pengguna</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-num">100%</span>
+                        <span class="stat-label">Digital</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: App Mockups (no border frames) -->
+            <div class="hero-right">
+                <!-- Trust badge -->
+                <div class="trust-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    Aplikasi Terpercaya
+                </div>
+
+                <div class="mockup-stack">
+                    <!-- Back-left phone (no frame) -->
+                    <div class="mockup mockup-left">
+                        <img src="assets/images/produk_pelanggan.png" alt="Katalog Produk">
+                    </div>
+                    <!-- Center main phone (no frame) -->
+                    <div class="mockup mockup-center">
+                        <img src="assets/images/home.png" alt="Beranda Aplikasi">
+                    </div>
+                    <!-- Back-right phone (no frame) -->
+                    <div class="mockup mockup-right">
+                        <img src="assets/images/dashboard_admin.png" alt="Dashboard Admin">
+                    </div>
+                </div>
+
+                <!-- Floating notification -->
+                <div class="notif-float">
+                    <div class="notif-check">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    </div>
+                    <div>
+                        <div class="notif-title">Pesanan Berhasil!</div>
+                        <div class="notif-sub">Sedang diproses · baru saja</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decorative wave at bottom -->
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none"><path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#FCFAF8"/></svg>
+        </div>
+    </section>
+
+    <!-- ─── FEATURES ─── -->
+    <section class="features" id="fitur">
+        <div class="container">
+            <div class="section-head">
+                <span class="section-label">FITUR UNGGULAN</span>
+                <h2 class="section-title">Semua yang Anda<br>Butuhkan, Ada di Sini</h2>
+            </div>
+
+            <div class="features-grid">
+
+                <!-- Card 1: Pemesanan Mudah -->
+                <div class="feat-card feat-has-img">
+                    <div class="feat-icon-svg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    </div>
+                    <h3>Pemesanan Mudah</h3>
+                    <p>Pilih produk, masukkan ke keranjang, dan checkout dalam hitungan detik — tanpa antrean.</p>
+                    <div class="feat-img-wrap feat-img-sm">
+                        <img src="assets/images/keranjang.png" alt="Tampilan keranjang belanja Roti 515" loading="lazy">
+                    </div>
+                </div>
+
+                <!-- Card 2: Katalog Lengkap -->
+                <div class="feat-card feat-has-img">
+                    <div class="feat-icon-svg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </div>
+                    <h3>Katalog Lengkap</h3>
+                    <p>Jelajahi berbagai pilihan roti dan kue, lengkap dengan foto dan deskripsi produk.</p>
+                    <div class="feat-img-wrap feat-img-sm">
+                        <img src="assets/images/produk_pelanggan.png" alt="Katalog produk Roti 515" loading="lazy">
+                    </div>
+                </div>
+
+                <!-- Card 3: Notifikasi -->
+                <div class="feat-card feat-has-img">
+                    <div class="feat-icon-svg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    </div>
+                    <h3>Notifikasi Real-time</h3>
+                    <p>Dapatkan pembaruan status pesanan secara langsung — dari proses hingga siap diambil.</p>
+                    <div class="feat-img-wrap feat-img-sm">
+                        <img src="assets/images/pelanggan terima notfikasi.png" alt="Notifikasi pesanan Roti 515" loading="lazy">
+                    </div>
+                </div>
+
+                <!-- Card 4: Dashboard Admin -->
+                <div class="feat-card feat-has-img">
+                    <div class="feat-icon-svg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 18h7m-3.5-3.5v7"/></svg>
+                    </div>
+                    <h3>Dashboard Admin</h3>
+                    <p>Pantau penjualan, kelola stok, dan proses pesanan dari satu dashboard terintegrasi.</p>
+                    <div class="feat-img-dashboard">
+                        <img src="assets/images/dashboard_admin.png" alt="Dashboard admin Roti 515" loading="lazy">
+                    </div>
+                </div>
+
+                <!-- Card 5: Riwayat Pesanan -->
+                <div class="feat-card feat-has-img">
+                    <div class="feat-icon-svg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <h3>Riwayat Pesanan</h3>
+                    <p>Lihat dan pantau semua riwayat transaksi Anda dengan mudah kapan saja.</p>
+                    <div class="feat-img-wrap feat-img-sm">
+                        <img src="assets/images/riwayat_pesanan dan batalkan pesanan.png" alt="Riwayat pesanan Roti 515" loading="lazy">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── SCREENSHOT SHOWCASE ─── -->
+    <section class="showcase">
+        <div class="container showcase-container">
+            <div class="showcase-text">
+                <span class="section-label">TAMPILAN APLIKASI</span>
+                <h2 class="section-title">Antarmuka Modern,<br><em>Pengalaman Premium.</em></h2>
+                <p>Dirancang dengan UI/UX terbaik menggunakan Flutter — responsif, cepat, dan nyaman digunakan oleh pelanggan maupun admin.</p>
+            </div>
+            <div class="showcase-screens">
+                <div class="screen-item screen-featured">
+                    <img src="assets/images/home.png" alt="Beranda Roti 515" loading="lazy">
+                    <span class="screen-label">Beranda</span>
+                </div>
+                <div class="screen-col">
+                    <div class="screen-item">
+                        <img src="assets/images/detail_menu.png" alt="Detail Menu" loading="lazy">
+                        <span class="screen-label">Detail Produk</span>
+                    </div>
+                    <div class="screen-item">
+                        <img src="assets/images/checkout.png" alt="Checkout" loading="lazy">
+                        <span class="screen-label">Checkout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── DOWNLOAD ─── -->
+    <section class="download-section" id="download">
+        <div class="container">
+            <div class="download-card">
+                <div class="dl-decor dl-decor-1"></div>
+                <div class="dl-decor dl-decor-2"></div>
+                <div class="dl-bg-img">
+                    <img src="hero_bg.png" alt="" aria-hidden="true">
+                </div>
+                <div class="dl-content">
+                    <span class="section-label light">MULAI SEKARANG</span>
+                    <h2 class="dl-title">Siap Memesan Roti<br>Favoritmu?</h2>
+                    <p class="dl-desc">Unduh aplikasi Roti 515 sekarang dan nikmati kemudahan pesan roti segar kapan saja.</p>
+                    <div class="dl-buttons">
+                        <a href="roti515.apk" download="Roti515.apk" class="dl-btn dl-btn-dark" id="btn-apk">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="#3DDC84">
+                                <path d="M17.523 15.341a.659.659 0 1 1 0-1.317.659.659 0 0 1 0 1.317m-11.046 0a.659.659 0 1 1 0-1.317.659.659 0 0 1 0 1.317M17.9 11.233l1.877-3.25a.39.39 0 0 0-.678-.39L17.21 10.86a8.985 8.985 0 0 0-5.21-1.046 8.985 8.985 0 0 0-5.348 1.046L4.9 7.593a.39.39 0 0 0-.678.39l1.877 3.25C2.648 13.125.325 16.733 0 20.933h24c-.325-4.2-2.648-7.808-6.1-9.7"/>
+                            </svg>
+                            <div>
+                                <span class="dl-sub">UNDUH APLIKASI</span>
+                                <span class="dl-main">APK Android</span>
+                            </div>
+                        </a>
+                        <a href="#" class="dl-btn dl-btn-orange" id="btn-web">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                            </svg>
+                            <div>
+                                <span class="dl-sub">AKSES LANGSUNG</span>
+                                <span class="dl-main">Web Application</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── FOOTER ─── -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="logo_badge.png" alt="Roti 515" class="footer-logo-img">
+                <span>Roti <strong>515</strong></span>
+            </div>
+            <p class="footer-copy">© 2026 Roti 515 · PSDKU Teknik Informatika Nganjuk · Politeknik Negeri Jember</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
