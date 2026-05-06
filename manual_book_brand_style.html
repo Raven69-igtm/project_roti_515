@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Identity & User Manual - Roti 515</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Lora:ital,wght@0,700;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --orange: #D47311;
+            --orange-dark: #A85A0A;
+            --bg-grid: #f0f0f0;
+            --dark: #1A0E04;
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: #F5F5F5; color: var(--dark); overflow-x: hidden; }
+
+        /* Background Grid Global */
+        .grid-bg {
+            background-image: 
+                linear-gradient(var(--bg-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Container Layout Buku */
+        .spread-container {
+            max-width: 1200px;
+            margin: 60px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 100px;
+        }
+
+        /* --- SPREAD PAGE SYSTEM --- */
+        .spread {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 700px;
+            background: var(--white);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .left-page, .right-page {
+            padding: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-page { border-right: 1px solid #EEE; }
+
+        /* Full Orange Page Style */
+        .orange-page {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        /* Typography */
+        .big-title { font-size: 6rem; font-weight: 900; line-height: 0.8; letter-spacing: -3px; margin-bottom: 20px; }
+        .sub-title { font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 5px; color: var(--orange); margin-bottom: 30px; }
+        .orange-page .sub-title { color: var(--white); opacity: 0.7; }
+        
+        .mono { font-family: 'Space Mono', monospace; font-size: 0.8rem; text-transform: uppercase; }
+
+        /* Sections */
+        .content-block { margin-top: 40px; }
+        .content-block h3 { margin-bottom: 15px; text-transform: uppercase; font-size: 1.5rem; }
+        .content-block p { color: #555; font-size: 1rem; line-height: 1.6; }
+        .orange-page .content-block p { color: rgba(255,255,255,0.8); }
+
+        /* Image Showcase */
+        .showcase-frame {
+            background: #f8f8f8;
+            padding: 10px;
+            border: 1px solid #EEE;
+            margin-top: 20px;
+        }
+        .showcase-frame img {
+            width: 100%;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Swatches */
+        .swatch-grid { display: flex; gap: 15px; margin-top: 20px; }
+        .swatch { width: 60px; height: 60px; border-radius: 4px; }
+
+        /* --- HALAMAN COVER --- */
+        .cover-page {
+            grid-column: span 2;
+            height: 900px;
+            position: relative;
+            color: var(--white);
+            background-image: url('docs/hero_bg.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                rgba(26,14,4,0.96) 0%,
+                rgba(26,14,4,0.85) 45%,
+                rgba(26,14,4,0.3) 100%
+            );
+            z-index: 1;
+        }
+        .cover-page > * {
+            position: relative;
+            z-index: 2;
+        }
+        .cover-text { text-align: left; z-index: 2; }
+
+        .vertical-text {
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: rotate(-90deg) translateY(-50%);
+            font-weight: 900;
+            color: #DDD;
+            letter-spacing: 10px;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        .spread-footer {
+            position: absolute;
+            bottom: 40px;
+            left: 80px;
+            right: 80px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            font-weight: 700;
+            opacity: 0.4;
+        }
+
+        @media (max-width: 900px) {
+            .spread { grid-template-columns: 1fr; }
+            .big-title { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body class="grid-bg">
+
+    <div class="spread-container">
+        
+        <!-- COVER SPREAD -->
+        <div class="spread cover-page" style="display: grid; grid-template-columns: 1.2fr 1fr; width: 100%; height: 100%; align-items: center; justify-content: stretch; padding: 0 120px;">
+            <div class="vertical-text" style="color: rgba(255,255,255,0.15);">BRAND GUIDEBOOK 2026</div>
+            
+            <!-- Left Side -->
+            <div class="cover-text" style="padding: 0;">
+                <!-- App Icon only (as requested) -->
+                <div style="margin-bottom: 30px;">
+                    <img src="assets/images/app_icon.png" alt="App Icon" style="width: 80px; height: 80px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);">
+                </div>
+
+                <div class="badge" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 50px; padding: 8px 20px; font-size: 9pt; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.8); text-transform: uppercase; margin-bottom: 25px;">
+                    <span class="badge-dot" style="width: 7px; height: 7px; border-radius: 50%; background: var(--orange); display: inline-block; box-shadow: 0 0 8px var(--orange);"></span>
+                    ROTI 515 · USER MANUAL & GUIDELINE
+                </div>
+                <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 4.5rem; font-weight: 800; color: #FFF; line-height: 1.1; letter-spacing: -2px; margin-bottom: 20px;">
+                    Pesan Roti Segar,<br>
+                    <span style="font-family: 'Lora', serif; font-style: italic; font-weight: 700; color: var(--orange);">Hangat & Nikmat.</span>
+                </h1>
+                <p class="mono" style="margin-top: 25px; color: rgba(255,255,255,0.6); font-size: 9.5pt; letter-spacing: 1px;">V1.0.0-STABLE / TIM DEVELOPER 2026 / POLITEKNIK NEGERI JEMBER</p>
+            </div>
+
+            <!-- Right Side (Mockups stack) -->
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;">
+                <div class="cover-mockup-stack" style="position: relative; width: 100%; height: 420px; display: flex; align-items: center; justify-content: center;">
+                    <!-- Back-left mockup -->
+                    <div class="cover-mockup cover-mockup-left" style="position: absolute; width: 120px; height: 250px; left: 5%; bottom: 30px; z-index: 1; transform: rotate(-8deg); border-radius: 14px; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); opacity: 0.75;">
+                        <img src="assets/images/produk_pelanggan.png" alt="Katalog" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <!-- Center main mockup -->
+                    <div class="cover-mockup cover-mockup-center" style="position: absolute; width: 140px; height: 290px; left: 50%; top: 30px; transform: translateX(-50%); z-index: 3; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.15);">
+                        <img src="assets/images/home.png" alt="Beranda" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <!-- Back-right mockup -->
+                    <div class="cover-mockup cover-mockup-right" style="position: absolute; width: 120px; height: 250px; right: 5%; bottom: 30px; z-index: 2; transform: rotate(8deg); border-radius: 14px; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); opacity: 0.75;">
+                        <img src="assets/images/dashboard_admin.png" alt="Admin" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+                <!-- Small website indicator -->
+                <div style="margin-top: 15px; background: rgba(212,115,17,0.15); border: 1px solid rgba(212,115,17,0.3); border-radius: 4px; padding: 4px 10px; font-size: 8pt; color: #FFA34D; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 4px;">
+                    🌐 Web Landing Page Style
+                </div>
+            </div>
+        </div>
+
+        <!-- SPREAD 1: INTRODUCTION & STORY -->
+        <div class="spread">
+            <div class="left-page orange-page">
+                <p class="sub-title">01 / WELCOME</p>
+                <h2 class="big-title">HELLO.</h2>
+                <div class="content-block">
+                    <p>Roti 515 hadir sebagai simbol transformasi digital bagi UMKM bakery. Kami tidak hanya menjual roti, kami menjual pengalaman belanja yang modern, praktis, dan terpercaya bagi setiap pelanggan.</p>
+                </div>
+                <div class="spread-footer"><span>ROTI 515</span><span>01</span></div>
+            </div>
+            <div class="right-page">
+                <p class="sub-title">STORY</p>
+                <div class="content-block">
+                    <h3>OUR JOURNEY</h3>
+                    <p>Dimulai dari keinginan untuk membantu toko roti lokal merambah dunia digital, Roti 515 dikembangkan untuk menjembatani antara tradisi rasa dan teknologi masa depan.</p>
+                </div>
+                <div class="content-block">
+                    <h3>THE MISSION</h3>
+                    <p>Menciptakan ekosistem di mana setiap orang dapat menikmati kehangatan roti segar dengan hanya satu sentuhan di layar smartphone mereka.</p>
+                </div>
+                <div class="spread-footer"><span>BRAND IDENTITY</span><span>02</span></div>
+            </div>
+        </div>
+
+        <!-- SPREAD 2: LOGO & COLORS -->
+        <div class="spread">
+            <div class="left-page">
+                <p class="sub-title">02 / IDENTITY</p>
+                <h3>THE LOGO</h3>
+                <div class="showcase-frame" style="background: white; border: none; text-align: center; padding: 60px;">
+                    <img src="assets/images/app_icon.png" style="width: 200px; margin: 0 auto;">
+                </div>
+                <p class="mono" style="margin-top: 20px; text-align: center;">Primary Brand Mark - Dark Version</p>
+                <div class="spread-footer"><span>IDENTITY</span><span>03</span></div>
+            </div>
+            <div class="right-page orange-page">
+                <p class="sub-title">COLOR PALETTE</p>
+                <h2 class="big-title" style="font-size: 4rem;">COLORS.</h2>
+                <div class="content-block">
+                    <p>Warna oranye melambangkan kehangatan oven dan energi, sementara warna gelap memberikan kesan profesional dan kemapanan.</p>
+                </div>
+                <div class="swatch-grid">
+                    <div class="swatch" style="background: var(--orange);"></div>
+                    <div class="swatch" style="background: var(--orange-dark);"></div>
+                    <div class="swatch" style="background: var(--dark);"></div>
+                    <div class="swatch" style="background: #FFFFFF; border: 1px solid #EEE;"></div>
+                </div>
+                <div class="spread-footer"><span>VISUAL LANGUAGE</span><span>04</span></div>
+            </div>
+        </div>
+
+        <!-- SPREAD 3: PANDUAN PELANGGAN 1 -->
+        <div class="spread">
+            <div class="left-page">
+                <p class="sub-title">03 / PANDUAN PELANGGAN</p>
+                <h2 class="big-title">LOGIN.</h2>
+                <div class="content-block">
+                    <h3>CARA LOGIN / DAFTAR</h3>
+                    <p>1. Buka aplikasi Roti 515. Pilih menu 'Login' atau 'Daftar' jika belum memiliki akun.<br>
+                       2. Masukkan email dan password Anda, atau masuk menggunakan data yang telah didaftarkan.<br>
+                       3. Setelah berhasil, Anda akan diarahkan ke halaman utama (Home).</p>
+                </div>
+                <div class="content-block">
+                    <h3>CARA MENCARI PRODUK</h3>
+                    <p>1. Di halaman utama, Anda dapat melihat produk-produk unggulan.<br>
+                       2. Gunakan kolom pencarian atau filter kategori untuk mencari roti atau biskuit.<br>
+                       3. Klik pada gambar produk untuk melihat detail dan deskripsi.</p>
+                </div>
+                <div class="spread-footer"><span>CUSTOMER GUIDE</span><span>05</span></div>
+            </div>
+            <div class="right-page">
+                <div class="showcase-frame">
+                    <img src="assets/images/home.png" alt="Home">
+                </div>
+                <p class="mono" style="margin-top: 10px;">Fig 1.1 - Discovery & Catalog Page</p>
+                <div class="showcase-frame" style="margin-top: 20px;">
+                    <img src="assets/images/detail_menu.png" alt="Detail">
+                </div>
+                <p class="mono" style="margin-top: 10px;">Fig 1.2 - Product Specification</p>
+                <div class="spread-footer"><span>VISUAL GUIDE</span><span>06</span></div>
+            </div>
+        </div>
+
+        <!-- SPREAD 4: TRANSAKSI & PESANAN -->
+        <div class="spread">
+            <div class="left-page orange-page">
+                <p class="sub-title">04 / TRANSAKSI</p>
+                <h2 class="big-title" style="font-size: 5rem;">ORDER.</h2>
+                <div class="content-block">
+                    <h3>CARA MELAKUKAN PESANAN</h3>
+                    <p>1. Pada halaman detail produk, atur jumlah pesanan.<br>
+                       2. Tambahkan catatan opsional jika diperlukan (misal: "tolong dipisah").<br>
+                       3. Tekan tombol "Tambah ke Keranjang" untuk melanjutkan belanja.</p>
+                </div>
+                <div class="content-block">
+                    <h3>CARA MELAKUKAN CHECKOUT</h3>
+                    <p>1. Buka menu Keranjang (Cart) yang berada di bawah layar.<br>
+                       2. Periksa kembali daftar pesanan Anda.<br>
+                       3. Pilih metode pembayaran dan atur rincian pengambilan.<br>
+                       4. Tekan tombol "Checkout" untuk mengonfirmasi transaksi.</p>
+                </div>
+                <div class="spread-footer"><span>TRANSACTION GUIDE</span><span>07</span></div>
+            </div>
+            <div class="right-page">
+                <p class="sub-title">MANAJEMEN PESANAN</p>
+                <h2 class="big-title" style="font-size: 4rem;">TRACK.</h2>
+                <div class="content-block" style="margin-top: 20px;">
+                    <h3>MELACAK STATUS PESANAN</h3>
+                    <p>1. Buka menu 'Riwayat Pesanan' (Order History).<br>
+                       2. Anda dapat melihat pesanan dengan status "Menunggu Pembayaran", "Diproses", atau "Siap Diambil".<br>
+                       3. Klik pada pesanan untuk melihat detail invoice.</p>
+                </div>
+                <div class="content-block">
+                    <h3>MEMBATALKAN PESANAN</h3>
+                    <p>1. Di menu 'Riwayat Pesanan', pilih pesanan yang berstatus "Menunggu Pembayaran".<br>
+                       2. Scroll ke bawah dan tekan tombol "Batalkan Pesanan".<br>
+                       3. Konfirmasi pembatalan. (Pesanan yang sedang diproses tidak dapat dibatalkan melalui aplikasi).</p>
+                </div>
+                <div class="spread-footer"><span>ORDER MANAGEMENT</span><span>08</span></div>
+            </div>
+        </div>
+
+        <!-- SPREAD 5: INTERFACE - ADMIN -->
+        <div class="spread">
+            <div class="left-page">
+                <p class="sub-title">05 / KENDALI ADMIN</p>
+                <h2 class="big-title">ADMIN.</h2>
+                <div class="content-block">
+                    <h3>MENGELOLA PESANAN MASUK</h3>
+                    <p>Admin dapat melihat pesanan baru, memperbarui status menjadi "Diproses" atau "Siap Diambil", yang otomatis mengirim notifikasi ke pelanggan.</p>
+                </div>
+                <div class="content-block">
+                    <h3>MANAJEMEN PRODUK & STOK</h3>
+                    <p>Tambahkan, edit, atau hapus produk dengan mudah. Admin juga bisa memperbarui status ketersediaan stok roti secara real-time.</p>
+                </div>
+                <div class="spread-footer"><span>ADMIN GUIDE</span><span>09</span></div>
+            </div>
+            <div class="right-page orange-page">
+                <div class="showcase-frame" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                    <img src="assets/images/dashboard_admin.png" alt="Dashboard" style="border-radius: 4px;">
+                </div>
+                <p class="mono" style="margin-top: 10px; color: rgba(255,255,255,0.8);">Fig 2.1 - Analytics & Statistics</p>
+                <div class="showcase-frame" style="margin-top: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                    <img src="assets/images/kelola_produk_admin.png" alt="Manage" style="border-radius: 4px;">
+                </div>
+                <p class="mono" style="margin-top: 10px; color: rgba(255,255,255,0.8);">Fig 2.2 - Inventory Management</p>
+                <div class="spread-footer"><span>CONTROL PANEL</span><span>10</span></div>
+            </div>
+        </div>
+
+        <!-- SPREAD 6: SUPPORT & FLOW -->
+        <div class="spread">
+            <div class="left-page">
+                <p class="sub-title">06 / SYSTEM</p>
+                <h2 class="big-title">LOGIC.</h2>
+                <div class="content-block">
+                    <h3>SYSTEM FLOW</h3>
+                    <p class="mono">ORDER > CHECKOUT > CONFIRM > PRODUCE > READY</p>
+                </div>
+                <div class="content-block" style="margin-top: 80px;">
+                    <h3>TROUBLESHOOTING</h3>
+                    <p style="font-size: 0.8rem;">Gagal Login: Cek typo/Lupa sandi.<br>Gambar Kosong: Refresh/Hapus Cache.<br>Checkout Gagal: Cek stok terbaru.</p>
+                </div>
+                <div class="spread-footer"><span>TECHNICAL</span><span>11</span></div>
+            </div>
+            <div class="right-page orange-page">
+                <h2 class="big-title" style="margin-top: 100px;">THANK<br>YOU.</h2>
+                <p class="mono" style="margin-top: 40px;">Roti 515 - Digitalizing the Bakeries.</p>
+                <div class="spread-footer"><span>CLOSING</span><span>12</span></div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

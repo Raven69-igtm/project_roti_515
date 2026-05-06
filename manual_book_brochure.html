@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Brochure Full Version - Roti 515</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Lora:ital,wght@0,700;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --orange: #E8650A;
+            --orange-2: #FF9A3C;
+            --dark: #111827;
+            --dark-2: #1F2937;
+            --gray: #F9FAFB;
+            --gray-2: #F3F4F6;
+            --text: #374151;
+            --text-light: #6B7280;
+            --white: #FFFFFF;
+            --accent: #FFF7ED;
+            --border: #E5E7EB;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        @page { size: A4 portrait; margin: 0; }
+
+        body { font-family: 'Inter', sans-serif; color: var(--text); background: #D1D5DB; }
+        .book-container { width: 210mm; margin: 0 auto; }
+
+        .page-wrap {
+            width: 210mm;
+            height: 297mm;
+            background: var(--white);
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── COVER ────────────────────────────────────────────── */
+        .page-cover {
+            background: linear-gradient(
+                160deg,
+                rgba(20,10,2,0.97) 0%,
+                rgba(20,10,2,0.88) 55%,
+                rgba(20,10,2,0.72) 100%
+            ), url('docs/hero_bg.png') #1A0E04 !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            color: #fff !important;
+            position: relative !important;
+            padding: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            overflow: hidden !important;
+        }
+        /* make every direct child sit above overlay */
+        .page-cover > * { position: relative; z-index: 1; }
+
+        /* LEFT/FULL column — now full width */
+        .cvl {
+            width: 100%;
+            padding: 10mm 14mm 8mm 14mm;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            flex: 1;
+        }
+
+        /* RIGHT column — hidden (phones are now inline) */
+        .cvr { display: none; }
+
+        /* Phone fan — properly centered inside cvr */
+        .phone-fan {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 310px;
+            height: 400px;
+        }
+        .pf-center {
+            position: absolute;
+            width: 148px;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            z-index: 4;
+            filter: drop-shadow(0 28px 44px rgba(0,0,0,0.80));
+        }
+        .pf-left {
+            position: absolute;
+            width: 124px;
+            right: calc(50% + 32px);
+            top: 44px;
+            z-index: 2;
+            transform: rotate(-10deg);
+            transform-origin: bottom center;
+            opacity: 0.80;
+            filter: drop-shadow(0 18px 30px rgba(0,0,0,0.65));
+        }
+        .pf-right {
+            position: absolute;
+            width: 124px;
+            left: calc(50% + 32px);
+            top: 44px;
+            z-index: 3;
+            transform: rotate(10deg);
+            transform-origin: bottom center;
+            opacity: 0.86;
+            filter: drop-shadow(0 18px 30px rgba(0,0,0,0.65));
+        }
+        .pf-center img, .pf-left img, .pf-right img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Toast notification card */
+        .cover-toast {
+            position: absolute;
+            bottom: 15%;
+            right: 4%;
+            background: #fff;
+            border-radius: 14px;
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.35), 0 3px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+            min-width: 140px;
+        }
+        .toast-icon {
+            width: 30px; height: 30px;
+            background: #D47311;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .toast-text p { margin: 0; }
+        .toast-title  { font-size: 7.5pt; font-weight: 800; color: #1A0E04; }
+        .toast-sub    { font-size: 6pt; color: #999; margin-top: 1px !important; }
+        .cover-bg-art {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #111827 0%, #1F2937 50%, #111827 100%);
+        }
+        .cover-orange-block {
+            position: absolute; right: 0; top: 0; width: 42%; height: 100%;
+            background: linear-gradient(160deg, var(--orange) 0%, #FF9A3C 100%);
+            clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        .cover-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .cover-content {
+            position: relative; z-index: 2;
+            padding: 0 18mm 18mm 18mm;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .cover-badge {
+            display: inline-block;
+            background: var(--orange);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 2px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+        .cover-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 5.5rem;
+            font-weight: 800;
+            line-height: 0.9;
+            color: var(--white);
+            margin-bottom: 8px;
+            letter-spacing: -3px;
+        }
+        .cover-title span { color: var(--orange); }
+        .cover-subtitle {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .cover-meta {
+            display: flex; gap: 24px; border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 20px;
+        }
+        .cover-meta-item { }
+        .cover-meta-item .label { font-size: 0.65rem; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; }
+        .cover-meta-item .value { font-size: 0.85rem; color: rgba(255,255,255,0.8); font-weight: 600; margin-top: 2px; }
+        .cover-logo-mark {
+            position: absolute; top: 14mm; left: 18mm; z-index: 3;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .cover-logo-mark img { width: 44px; border-radius: 10px; }
+        .cover-logo-mark span { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 800; color: white; letter-spacing: 1px; }
+
+        /* ── CONTENT PAGES ───────────────────────────────────────── */
+        .page-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Left dark sidebar */
+        .page-sidebar {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 14mm;
+            background: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12mm 0;
+            z-index: 10;
+        }
+        .sidebar-brand {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.55rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.25);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+        .sidebar-dot {
+            width: 8px; height: 8px;
+            background: var(--orange);
+            border-radius: 50%;
+        }
+        .sidebar-page-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--orange);
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+
+        /* Main content area (offset for sidebar) */
+        .page-body {
+            margin-left: 14mm;
+            padding: 12mm 14mm 12mm 12mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header strip */
+        .page-header-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8mm;
+            padding-bottom: 5mm;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-tag {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--orange);
+            background: var(--accent);
+            padding: 4px 10px;
+            border-radius: 2px;
+        }
+        .section-tag.admin { background: #EEF2FF; color: #4F46E5; }
+        .page-logo-small { width: 28px; opacity: 0.3; }
+
+        /* Titles */
+        .title-large {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.05;
+            margin-bottom: 6mm;
+            letter-spacing: -1px;
+        }
+        .title-large .accent { color: var(--orange); }
+        .title-large .accent-indigo { color: #4F46E5; }
+
+        /* Step box */
+        .step-box {
+            background: var(--accent);
+            border-left: 3px solid var(--orange);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            margin-bottom: 6mm;
+        }
+        .step-box.admin { background: #EEF2FF; border-left-color: #4F46E5; }
+        .step-box p {
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: var(--text);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .step-box p:last-child { margin-bottom: 0; }
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px; height: 20px;
+            background: var(--orange);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .step-num.indigo { background: #4F46E5; }
+
+        /* Screenshot */
+        .screenshot-wrap { margin-top: 5mm; }
+        .screenshot-container {
+            background: var(--gray-2);
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+        }
+        .screenshot-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--orange), var(--orange-2));
+            border-radius: 10px 10px 0 0;
+        }
+        .screenshot-container.admin::before { background: linear-gradient(90deg, #4F46E5, #818CF8); }
+        .screenshot-container img {
+            width: 100%;
+            border-radius: 6px;
+            object-fit: contain;
+            max-height: 390px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .caption {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* Two-column layout */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .two-col .screenshot-container img { max-height: 300px; }
+
+        /* TOC page */
+        .toc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border);
+            gap: 8px;
+        }
+        .toc-item:last-child { border-bottom: none; }
+        .toc-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--orange);
+            min-width: 36px;
+        }
+        .toc-label { font-size: 0.88rem; font-weight: 600; color: var(--dark); flex: 1; }
+        .toc-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-light);
+        }
+
+        /* Footer bar */
+        .page-footer-bar {
+            position: absolute;
+            bottom: 0; left: 14mm; right: 0;
+            height: 10mm;
+            background: var(--gray-2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14mm 0 12mm;
+        }
+        .page-footer-bar span { font-size: 0.65rem; color: var(--text-light); font-weight: 600; letter-spacing: 1px; }
+        .footer-brand { color: var(--orange) !important; }
+
+        @media screen {
+            body { padding: 40px 0; }
+            .page-wrap { margin-bottom: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        }
+    
+
+        /* ── PRINT STYLES ───────────────────────────────────────── */
+        @media print {
+            body {
+                background: none !important;
+                background-color: transparent !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .book-container {
+                width: 210mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .page-wrap {
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                margin: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+</style>
+</head>
+<body>
+<div class="book-container">
+
+    <!-- COVER — Manual Book Brochure A4 Portrait -->
+    <div class="page-wrap page-cover">
+
+        <!-- LEFT: manual book text content -->
+        <div class="cvl">
+            <div>
+                <!-- App icon + name -->
+                <div style="display:flex;align-items:center;gap:9px;margin-bottom:5mm;">
+                    <img src="assets/images/app_icon.png" alt="App Icon"
+                         style="width:44px;height:44px;border-radius:11px;
+                                box-shadow:0 6px 18px rgba(0,0,0,0.55);display:block;">
+                    <span style="font-family:'Space Mono',monospace;font-size:7.5pt;
+                                 font-weight:700;letter-spacing:2px;
+                                 color:rgba(255,255,255,0.55);text-transform:uppercase;">Roti 515</span>
+                </div>
+
+                <!-- Manual book type label -->
+                <div style="display:inline-flex;align-items:center;gap:6px;
+                            background:rgba(212,115,17,0.15);
+                            border:1px solid rgba(212,115,17,0.35);
+                            border-radius:4px;padding:4px 11px;
+                            font-size:7pt;font-weight:700;letter-spacing:1.5px;
+                            color:#FFA34D;text-transform:uppercase;
+                            margin-bottom:4mm;">
+                    &#128218; BUKU PANDUAN PENGGUNA
+                </div>
+
+                <!-- Main title -->
+                <h1 style="font-family:'Plus Jakarta Sans',sans-serif;
+                           font-size:30pt;font-weight:800;color:#FFFFFF;
+                           line-height:1.10;letter-spacing:-1.5px;
+                           margin:0 0 2mm 0;">
+                    Pesan Roti Segar,
+                </h1>
+                <h1 style="font-family:'Lora',serif;
+                           font-size:30pt;font-weight:700;
+                           font-style:italic;color:#D47311;
+                           line-height:1.10;letter-spacing:-1px;
+                           margin:0 0 4mm 0;">
+                    Hangat &amp; Nikmat.
+                </h1>
+
+                <!-- Manual book subtitle -->
+                <p style="font-size:9pt;color:rgba(255,255,255,0.62);
+                           line-height:1.65;max-width:235px;margin:0 0 5mm 0;">
+                    Panduan lengkap penggunaan Aplikasi Roti 515 untuk Pelanggan &amp; Administrator — dilengkapi tangkapan layar dan langkah-langkah detail.
+                </p>
+
+                <!-- Document info block (replaces CTA button) -->
+                <div style="background:rgba(255,255,255,0.06);
+                             border:1px solid rgba(255,255,255,0.10);
+                             border-radius:10px;padding:10px 14px;
+                             display:grid;grid-template-columns:1fr 1fr;
+                             gap:8px 14px;">
+                    <div>
+                        <p style="font-family:'Space Mono',monospace;font-size:6pt;
+                                   letter-spacing:1.5px;color:rgba(255,255,255,0.35);
+                                   text-transform:uppercase;margin:0 0 2px 0;">Jenis Dokumen</p>
+                        <p style="font-size:7.5pt;font-weight:700;color:#fff;margin:0;">Manual Book</p>
+                    </div>
+                    <div>
+                        <p style="font-family:'Space Mono',monospace;font-size:6pt;
+                                   letter-spacing:1.5px;color:rgba(255,255,255,0.35);
+                                   text-transform:uppercase;margin:0 0 2px 0;">Versi</p>
+                        <p style="font-size:7.5pt;font-weight:700;color:#fff;margin:0;">v1.0.0 &mdash; 2026</p>
+                    </div>
+                    <div>
+                        <p style="font-family:'Space Mono',monospace;font-size:6pt;
+                                   letter-spacing:1.5px;color:rgba(255,255,255,0.35);
+                                   text-transform:uppercase;margin:0 0 2px 0;">Target Pengguna</p>
+                        <p style="font-size:7.5pt;font-weight:700;color:#fff;margin:0;">Pelanggan &amp; Admin</p>
+                    </div>
+                    <div>
+                        <p style="font-family:'Space Mono',monospace;font-size:6pt;
+                                   letter-spacing:1.5px;color:rgba(255,255,255,0.35);
+                                   text-transform:uppercase;margin:0 0 2px 0;">Platform</p>
+                        <p style="font-size:7.5pt;font-weight:700;color:#fff;margin:0;">Android (Flutter)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Phone fan: inline, below info grid ── -->
+            <div style="display:flex;justify-content:center;align-items:flex-end;
+                         gap:0;margin:2mm 0;overflow:visible;position:relative;
+                         height:105mm;">
+                <!-- Left phone -->
+                <div style="flex-shrink:0;transform:rotate(-9deg) translateY(10px);
+                             transform-origin:bottom center;opacity:0.78;
+                             filter:drop-shadow(0 20px 35px rgba(0,0,0,0.72));
+                             margin-right:-32px;position:relative;z-index:2;">
+                    <img src="assets/images/produk_pelanggan.png" alt="Katalog"
+                         style="width:155px;display:block;">
+                </div>
+                <!-- Center phone (main, tallest) -->
+                <div style="flex-shrink:0;
+                             filter:drop-shadow(0 30px 50px rgba(0,0,0,0.85));
+                             position:relative;z-index:4;">
+                    <img src="assets/images/home.png" alt="Beranda"
+                         style="width:195px;display:block;">
+                </div>
+                <!-- Right phone -->
+                <div style="flex-shrink:0;transform:rotate(9deg) translateY(10px);
+                             transform-origin:bottom center;opacity:0.84;
+                             filter:drop-shadow(0 20px 35px rgba(0,0,0,0.72));
+                             margin-left:-32px;position:relative;z-index:3;">
+                    <img src="assets/images/dashboard_admin.png" alt="Admin"
+                         style="width:155px;display:block;">
+                </div>
+            </div>
+
+            <!-- Bottom: institution info -->
+            <div style="margin-top:auto;">
+                <div style="display:flex;gap:0;margin-bottom:4mm;">
+                    <div style="flex:1;padding-right:10px;
+                                border-right:1px solid rgba(255,255,255,0.12);">
+                        <p style="font-family:'Plus Jakarta Sans',sans-serif;
+                                   font-size:18pt;font-weight:800;color:#D47311;
+                                   margin:0;line-height:1;">7+</p>
+                        <p style="font-size:6pt;letter-spacing:1.5px;
+                                   color:rgba(255,255,255,0.40);
+                                   text-transform:uppercase;margin:3px 0 0 0;">Fitur Utama</p>
+                    </div>
+                    <div style="flex:1;padding:0 10px;
+                                border-right:1px solid rgba(255,255,255,0.12);">
+                        <p style="font-family:'Plus Jakarta Sans',sans-serif;
+                                   font-size:18pt;font-weight:800;color:#fff;
+                                   margin:0;line-height:1;">2</p>
+                        <p style="font-size:6pt;letter-spacing:1.5px;
+                                   color:rgba(255,255,255,0.40);
+                                   text-transform:uppercase;margin:3px 0 0 0;">Role Pengguna</p>
+                    </div>
+                    <div style="flex:1;padding-left:10px;">
+                        <p style="font-family:'Plus Jakarta Sans',sans-serif;
+                                   font-size:18pt;font-weight:800;color:#fff;
+                                   margin:0;line-height:1;">13</p>
+                        <p style="font-size:6pt;letter-spacing:1.5px;
+                                   color:rgba(255,255,255,0.40);
+                                   text-transform:uppercase;margin:3px 0 0 0;">Bab Panduan</p>
+                    </div>
+                </div>
+                <div style="border-top:1px solid rgba(255,255,255,0.10);
+                             padding-top:8px;display:flex;
+                             justify-content:space-between;align-items:center;">
+                    <span style="font-family:'Space Mono',monospace;font-size:6pt;
+                                 color:rgba(255,255,255,0.28);letter-spacing:1.5px;">MPPL &bull; TI Nganjuk</span>
+                    <span style="font-size:6.5pt;font-weight:600;
+                                 color:rgba(255,255,255,0.38);">Politeknik Negeri Jember</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIGHT: phone fan stack (mirrors landing page) ── -->
+        <div class="cvr">
+            <!-- Three phones in fan arrangement -->
+            <div class="phone-fan">
+                <!-- Left phone: produk / katalog -->
+                <div class="pf-left">
+                    <img src="assets/images/produk_pelanggan.png" alt="Katalog">
+                </div>
+                <!-- Center phone: home (largest, front) -->
+                <div class="pf-center">
+                    <img src="assets/images/home.png" alt="Beranda">
+                </div>
+                <!-- Right phone: dashboard admin -->
+                <div class="pf-right">
+                    <img src="assets/images/dashboard_admin.png" alt="Admin">
+                </div>
+            </div>
+
+            <!-- Toast notification card -->
+            <div class="cover-toast">
+                <div class="toast-icon">&#10003;</div>
+                <div class="toast-text">
+                    <p class="toast-title">Pesanan Berhasil!</p>
+                    <p class="toast-sub">Sedang diproses &middot; baru saja</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DAFTAR ISI -->
+    <div class="page-wrap">
+        <div class="page-sidebar">
+            <div class="sidebar-brand">Roti 515</div>
+            <div class="sidebar-dot"></div>
+            <div class="sidebar-page-num">i</div>
+        </div>
+        <div class="page-body">
+            <div class="page-header-strip">
+                <span class="section-tag">CONTENTS</span>
+                <img src="assets/images/app_icon.png" class="page-logo-small">
+            </div>
+            <h2 class="title-large">Daftar<br><span class="accent">Isi</span></h2>
+            <div style="margin-top:6mm;">
+                <div class="toc-item"><span class="toc-num">01</span><span class="toc-label">Pendahuluan &amp; Beranda</span><span class="toc-tag">Intro</span></div>
+                <div class="toc-item"><span class="toc-num">02</span><span class="toc-label">Panduan Registrasi Akun</span><span class="toc-tag">Customer</span></div>
+                <div class="toc-item"><span class="toc-num">03</span><span class="toc-label">Panduan Login</span><span class="toc-tag">Customer</span></div>
+                <div class="toc-item"><span class="toc-num">04</span><span class="toc-label">Katalog &amp; Cari Produk</span><span class="toc-tag">Customer</span></div>
+                <div class="toc-item"><span class="toc-num">05</span><span class="toc-label">Detail Produk &amp; Keranjang</span><span class="toc-tag">Customer</span></div>
+                <div class="toc-item"><span class="toc-num">06</span><span class="toc-label">Proses Checkout</span><span class="toc-tag">Customer</span></div>
+                <div class="toc-item"><span class="toc-num">07</span><span class="toc-label">Konfirmasi &amp; Notifikasi</span><span class="toc-tag">Customer</span></div>
+                <div class="toc-item"><span class="toc-num">08</span><span class="toc-label">Riwayat &amp; Batalkan Pesanan</span><span class="toc-tag">Customer</span></div>
+                <div class="toc-item"><span class="toc-num">09</span><span class="toc-label">Dashboard &amp; Statistik Admin</span><span class="toc-tag">Admin</span></div>
+                <div class="toc-item"><span class="toc-num">10</span><span class="toc-label">Atur Jadwal Pengambilan</span><span class="toc-tag">Admin</span></div>
+                <div class="toc-item"><span class="toc-num">11</span><span class="toc-label">Kelola Produk &amp; Stok</span><span class="toc-tag">Admin</span></div>
+                <div class="toc-item"><span class="toc-num">12</span><span class="toc-label">Kelola Akun Pengguna</span><span class="toc-tag">Admin</span></div>
+                <div class="toc-item"><span class="toc-num">13</span><span class="toc-label">Troubleshooting &amp; Penutup</span><span class="toc-tag">Technical</span></div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN i</span></div>
+    </div>
+
+    <!-- PAGE 01: PENDAHULUAN -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">01</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">INTRODUCTION</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Modernisasi<br><span class="accent">UMKM Bakery</span></h2>
+            <p style="font-size:0.88rem;color:var(--text-light);margin-bottom:5mm;">Roti 515 membantu usaha roti lokal bertransformasi digital — memudahkan pemesanan, pengelolaan stok, dan komunikasi dengan pelanggan dalam satu platform.</p>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container">
+                    <img src="assets/images/home.png" alt="Beranda">
+                    <p class="caption">Gbr 1.1 — Halaman Beranda Utama Roti 515</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 01</span></div>
+    </div>
+
+    <!-- PAGE 02: REGISTRASI -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">02</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">CUSTOMER GUIDE</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Panduan<br><span class="accent">Registrasi</span></h2>
+            <div class="step-box">
+                <p><span class="step-num">1</span> Buka aplikasi dan pilih tombol <strong>"Daftar"</strong> di halaman utama.</p>
+                <p><span class="step-num">2</span> Isi nama lengkap, alamat email, password, dan nomor telepon aktif.</p>
+                <p><span class="step-num">3</span> Tekan <strong>"Daftar"</strong> — akun Anda langsung aktif dan siap digunakan.</p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container">
+                    <img src="assets/images/daftar.png">
+                    <p class="caption">Gbr 1.2 — Form Pendaftaran Akun Pengguna</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 02</span></div>
+    </div>
+
+    <!-- PAGE 03: LOGIN -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">03</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">CUSTOMER GUIDE</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Panduan<br><span class="accent">Login</span></h2>
+            <div class="step-box">
+                <p><span class="step-num">1</span> Buka aplikasi dan pilih <strong>"Login"</strong> jika sudah memiliki akun.</p>
+                <p><span class="step-num">2</span> Masukkan alamat email dan password yang telah didaftarkan.</p>
+                <p><span class="step-num">3</span> Tekan <strong>"Masuk"</strong> — Anda akan diarahkan langsung ke Beranda.</p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container">
+                    <img src="assets/images/login.png">
+                    <p class="caption">Gbr 1.3 — Halaman Masuk Pengguna</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 03</span></div>
+    </div>
+
+    <!-- PAGE 04: KATALOG -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">04</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">CUSTOMER GUIDE</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Katalog<br><span class="accent">Produk</span></h2>
+            <div class="step-box">
+                <p><span class="step-num">1</span> Ketuk ikon pencarian dan ketik nama roti yang ingin dicari.</p>
+                <p><span class="step-num">2</span> Filter produk berdasarkan kategori (Roti, Kue, Biskuit, dll).</p>
+                <p><span class="step-num">3</span> Tap foto produk untuk melihat detail lengkap dan stok tersedia.</p>
+            </div>
+            <div class="two-col">
+                <div class="screenshot-container"><img src="assets/images/Cari Produk.png"><p class="caption">Gbr 1.4a — Fitur Pencarian</p></div>
+                <div class="screenshot-container"><img src="assets/images/produk_pelanggan.png"><p class="caption">Gbr 1.4b — Katalog Produk</p></div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 04</span></div>
+    </div>
+
+    <!-- PAGE 05: DETAIL & KERANJANG -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">05</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">CUSTOMER GUIDE</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Detail &amp;<br><span class="accent">Keranjang</span></h2>
+            <div class="step-box">
+                <p><span class="step-num">1</span> Tap produk, atur kuantitas, lalu tekan <strong>"Tambah ke Keranjang"</strong>.</p>
+                <p><span class="step-num">2</span> Buka ikon Keranjang di navigasi bawah untuk meninjau pesanan.</p>
+                <p><span class="step-num">3</span> Periksa total harga dan lanjutkan ke proses Checkout.</p>
+            </div>
+            <div class="two-col">
+                <div class="screenshot-container"><img src="assets/images/detail_menu.png"><p class="caption">Gbr 1.5a — Detail Produk</p></div>
+                <div class="screenshot-container"><img src="assets/images/keranjang.png"><p class="caption">Gbr 1.5b — Keranjang Belanja</p></div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 05</span></div>
+    </div>
+
+    <!-- PAGE 06: CHECKOUT -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">06</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">CUSTOMER GUIDE</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Proses<br><span class="accent">Checkout</span></h2>
+            <div class="step-box">
+                <p><span class="step-num">1</span> Pilih metode pembayaran yang tersedia (Cash / Transfer).</p>
+                <p><span class="step-num">2</span> Atur tanggal dan jam pengambilan pesanan di toko.</p>
+                <p><span class="step-num">3</span> Tekan <strong>"Checkout"</strong> — kode unik pesanan Anda akan segera muncul.</p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container">
+                    <img src="assets/images/checkout_roti515.png">
+                    <p class="caption">Gbr 1.6 — Halaman Konfirmasi Checkout &amp; Jadwal Ambil</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 06</span></div>
+    </div>
+
+    <!-- PAGE 07: NOTIFIKASI -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">07</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">CUSTOMER GUIDE</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Konfirmasi &amp;<br><span class="accent">Notifikasi</span></h2>
+            <div class="step-box">
+                <p><span class="step-num">✓</span> Simpan <strong>Kode Pesanan</strong> (contoh: 515-38411) untuk ditunjukkan saat ambil di toko.</p>
+                <p><span class="step-num">🔔</span> Notifikasi otomatis masuk saat status berubah: <em>Diproses</em> atau <em>Siap Diambil</em>.</p>
+            </div>
+            <div class="two-col">
+                <div class="screenshot-container"><img src="assets/images/Pesanan Berhasil.png"><p class="caption">Gbr 1.7a — Layar Pesanan Berhasil</p></div>
+                <div class="screenshot-container"><img src="assets/images/pelanggan terima notfikasi.png"><p class="caption">Gbr 1.7b — Notifikasi Masuk</p></div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 07</span></div>
+    </div>
+
+    <!-- PAGE 08: RIWAYAT & BATAL -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">08</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">CUSTOMER GUIDE</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Riwayat &amp;<br><span class="accent">Batalkan</span></h2>
+            <div class="step-box">
+                <p><span class="step-num">1</span> Buka menu <strong>Riwayat Pesanan</strong> untuk melacak status: Menunggu, Diproses, Siap Diambil.</p>
+                <p><span class="step-num">2</span> Untuk membatalkan, pilih pesanan <em>"Menunggu"</em>, scroll ke bawah, tekan <strong>"Batalkan"</strong>.</p>
+                <p><span class="step-num">!</span><span style="color:#DC2626;font-weight:600;">Pesanan berstatus "Diproses" tidak dapat dibatalkan.</span></p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container">
+                    <img src="assets/images/riwayat_pesanan dan batalkan pesanan.png">
+                    <p class="caption">Gbr 1.8 — Riwayat Pesanan &amp; Tombol Batalkan</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 08</span></div>
+    </div>
+
+    <!-- PAGE 09: DASHBOARD ADMIN -->
+    <div class="page-wrap">
+        <div class="page-sidebar" style="background:#1e1b4b;"><div class="sidebar-brand">Admin</div><div class="sidebar-dot" style="background:#818CF8;"></div><div class="sidebar-page-num" style="color:#818CF8;">09</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag admin">ADMIN PORTAL</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Portal<br><span class="accent-indigo">Statistik</span></h2>
+            <div class="step-box admin">
+                <p><span class="step-num indigo">📊</span> Pantau ringkasan pendapatan harian, total pesanan, dan grafik penjualan.</p>
+                <p><span class="step-num indigo">→</span> Ubah status pesanan: <strong>Tertunda → Diproses → Selesai</strong> langsung dari dashboard.</p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container admin">
+                    <img src="assets/images/dashboard_admin.png">
+                    <p class="caption">Gbr 2.1 — Dashboard Ringkasan Bisnis Admin</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand" style="color:#4F46E5;">ADMIN PORTAL</span><span>HALAMAN 09</span></div>
+    </div>
+
+    <!-- PAGE 10: ATUR JADWAL -->
+    <div class="page-wrap">
+        <div class="page-sidebar" style="background:#1e1b4b;"><div class="sidebar-brand">Admin</div><div class="sidebar-dot" style="background:#818CF8;"></div><div class="sidebar-page-num" style="color:#818CF8;">10</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag admin">ADMIN PORTAL</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Atur<br><span class="accent-indigo">Jadwal Ambil</span></h2>
+            <div class="step-box admin">
+                <p><span class="step-num indigo">1</span> Buka detail pesanan yang berstatus <strong>"Diproses"</strong>.</p>
+                <p><span class="step-num indigo">2</span> Ketuk <strong>"Atur Jadwal"</strong> dan tentukan tanggal serta jam pengambilan.</p>
+                <p><span class="step-num indigo">3</span> Simpan — pelanggan otomatis menerima notifikasi jadwal ambil.</p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container admin">
+                    <img src="assets/images/admin atur jam pengembalian.png">
+                    <p class="caption">Gbr 2.2 — Admin Menetapkan Jadwal Pengambilan</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand" style="color:#4F46E5;">ADMIN PORTAL</span><span>HALAMAN 10</span></div>
+    </div>
+
+    <!-- PAGE 11: KELOLA PRODUK -->
+    <div class="page-wrap">
+        <div class="page-sidebar" style="background:#1e1b4b;"><div class="sidebar-brand">Admin</div><div class="sidebar-dot" style="background:#818CF8;"></div><div class="sidebar-page-num" style="color:#818CF8;">11</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag admin">ADMIN PORTAL</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Kelola<br><span class="accent-indigo">Produk</span></h2>
+            <div class="step-box admin">
+                <p><span class="step-num indigo">+</span> <strong>Tambah:</strong> Isi nama, harga, kategori, dan upload foto produk baru.</p>
+                <p><span class="step-num indigo">✎</span> <strong>Edit:</strong> Perbarui harga, deskripsi, atau jumlah stok kapan saja.</p>
+                <p><span class="step-num indigo">✕</span> <strong>Hapus:</strong> Nonaktifkan produk dari katalog pelanggan seketika.</p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container admin">
+                    <img src="assets/images/kelola_produk_admin.png">
+                    <p class="caption">Gbr 2.3 — Manajemen Stok &amp; Produk Admin</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand" style="color:#4F46E5;">ADMIN PORTAL</span><span>HALAMAN 11</span></div>
+    </div>
+
+    <!-- PAGE 12: KELOLA AKUN -->
+    <div class="page-wrap">
+        <div class="page-sidebar" style="background:#1e1b4b;"><div class="sidebar-brand">Admin</div><div class="sidebar-dot" style="background:#818CF8;"></div><div class="sidebar-page-num" style="color:#818CF8;">12</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag admin">ADMIN PORTAL</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Kelola<br><span class="accent-indigo">Akun Pengguna</span></h2>
+            <div class="step-box admin">
+                <p><span class="step-num indigo">👁</span> <strong>Lihat Pengguna:</strong> Tampilkan seluruh daftar akun pelanggan yang terdaftar.</p>
+                <p><span class="step-num indigo">✎</span> <strong>Edit Akun:</strong> Perbarui data profil pengguna jika diperlukan.</p>
+                <p><span class="step-num indigo">✕</span> <strong>Hapus Akun:</strong> Nonaktifkan atau hapus akun pengguna yang bermasalah.</p>
+            </div>
+            <div class="screenshot-wrap">
+                <div class="screenshot-container admin">
+                    <img src="assets/images/kelola_akun_admin.png">
+                    <p class="caption">Gbr 2.4 — Manajemen Akun Pengguna oleh Admin</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand" style="color:#4F46E5;">ADMIN PORTAL</span><span>HALAMAN 12</span></div>
+    </div>
+
+    <!-- PAGE 13: TROUBLESHOOTING -->
+    <div class="page-wrap">
+        <div class="page-sidebar"><div class="sidebar-brand">Roti 515</div><div class="sidebar-dot"></div><div class="sidebar-page-num">13</div></div>
+        <div class="page-body">
+            <div class="page-header-strip"><span class="section-tag">TECHNICAL</span><img src="assets/images/app_icon.png" class="page-logo-small"></div>
+            <h2 class="title-large">Trouble<br><span class="accent">shooting</span></h2>
+            <table style="width:100%;border-collapse:collapse;margin-bottom:6mm;font-size:0.85rem;">
+                <tr><th style="background:var(--dark);color:white;padding:10px 14px;text-align:left;border-radius:4px 0 0 0;">Masalah</th><th style="background:var(--dark);color:white;padding:10px 14px;text-align:left;border-radius:0 4px 0 0;">Solusi</th></tr>
+                <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 14px;">Gagal Login</td><td style="padding:10px 14px;">Reset password atau periksa pengetikan email.</td></tr>
+                <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 14px;">Checkout Gagal</td><td style="padding:10px 14px;">Cek koneksi internet atau ketersediaan stok.</td></tr>
+                <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 14px;">Gambar Tidak Muncul</td><td style="padding:10px 14px;">Refresh halaman (F5) atau bersihkan cache browser.</td></tr>
+                <tr><td style="padding:10px 14px;">Notifikasi Tidak Masuk</td><td style="padding:10px 14px;">Pastikan izin notifikasi aplikasi aktif di pengaturan.</td></tr>
+            </table>
+            <div style="margin-top:auto;background:var(--dark);border-radius:12px;padding:24px;text-align:center;">
+                <p style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:800;color:var(--white);letter-spacing:-1px;">TERIMA KASIH.</p>
+                <p style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:10px;letter-spacing:2px;">COPYRIGHT © 2026 · TIM ROTI 515 · ALL RIGHTS RESERVED</p>
+            </div>
+        </div>
+        <div class="page-footer-bar"><span class="footer-brand">ROTI 515</span><span>HALAMAN 13</span></div>
+    </div>
+
+</div>
+</body>
+</html>

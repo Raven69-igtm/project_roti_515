@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Book - Roti 515 (A4 Portrait)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Lora:ital,wght@0,700;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #D47311;
+            --dark: #1A0E04;
+            --gray: #FCFAF8;
+            --white: #FFFFFF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #e0e0e0; color: var(--dark); }
+        
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: var(--white);
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            page-break-after: always;
+            padding: 20mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media print {
+            body { background: white; margin: 0; }
+            .page { margin: 0; box-shadow: none; border: none; }
+            @page { size: A4 portrait; margin: 0; }
+        }
+
+        /* typography */
+        .title-huge { font-size: 4rem; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--orange); }
+        .title-large { font-size: 2.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
+        .title-medium { font-size: 1.5rem; font-weight: 600; margin-bottom: 10px; color: var(--orange); text-transform: uppercase; }
+        .text-body { font-size: 1rem; line-height: 1.6; color: #444; margin-bottom: 20px; }
+        .mono { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #888; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--orange); padding-bottom: 10px; margin-bottom: 30px; }
+        .header .logo { width: 50px; }
+        .header .doc-title { font-weight: 800; font-size: 1.2rem; letter-spacing: 2px; }
+
+        .footer { position: absolute; bottom: 15mm; left: 20mm; right: 20mm; display: flex; justify-content: space-between; border-top: 1px solid #EEE; padding-top: 10px; }
+
+        /* cover specific */
+        .cover {
+            justify-content: flex-start;
+            align-items: stretch;
+            text-align: left;
+            background-image: url('docs/hero_bg.png');
+            background-size: cover;
+            background-position: center;
+            color: var(--white);
+            padding: 25mm 20mm;
+        }
+        .cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                rgba(26,14,4,0.96) 0%,
+                rgba(26,14,4,0.85) 45%,
+                rgba(26,14,4,0.40) 75%,
+                rgba(26,14,4,0.2) 100%
+            );
+            z-index: 1;
+        }
+        .cover > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* grid layout for content */
+        .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 20px; }
+        .full-col { grid-column: span 2; }
+        
+        .img-container { background: var(--gray); border-radius: 8px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+        .img-container img { max-width: 100%; max-height: 350px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        .step-box { background: var(--gray); padding: 20px; border-radius: 8px; border-left: 4px solid var(--orange); }
+        .step-box h4 { margin-bottom: 10px; font-size: 1.2rem; }
+        .step-box p { font-size: 0.95rem; margin-bottom: 8px; line-height: 1.5; }
+
+        /* cover split layout */
+        .cover-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        .cover-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .cover-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 100%;
+        }
+        .cover-mockup-stack {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            margin-top: 20px;
+        }
+        .cover-mockup {
+            position: absolute;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.75;
+            transition: all 0.3s ease;
+        }
+        .cover-mockup img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .cover-mockup-center {
+            width: 120px;
+            height: 250px;
+            left: 50%;
+            top: 40px;
+            transform: translateX(-50%);
+            z-index: 3;
+            border-radius: 15px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.15);
+            opacity: 1;
+        }
+        .cover-mockup-left {
+            width: 100px;
+            height: 210px;
+            left: 0%;
+            bottom: 60px;
+            z-index: 1;
+            transform: rotate(-8deg);
+        }
+        .cover-mockup-right {
+            width: 100px;
+            height: 210px;
+            right: 0%;
+            bottom: 60px;
+            z-index: 2;
+            transform: rotate(8deg);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: COVER -->
+    <div class="page cover">
+        <div class="cover-grid">
+            <!-- Left content column -->
+            <div class="cover-left">
+                <div>
+                    <!-- App Icon only (as requested) -->
+                    <div style="margin-top: 5mm; margin-bottom: 25mm;">
+                        <img src="assets/images/app_icon.png" alt="App Icon" style="width: 70px; height: 70px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);">
+                    </div>
+
+                    <div class="badge" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 50px; padding: 6px 16px; font-size: 8pt; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.8); text-transform: uppercase; margin-bottom: 15px;">
+                        <span class="badge-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--orange); display: inline-block; box-shadow: 0 0 8px var(--orange);"></span>
+                        ROTI 515 · USER GUIDE
+                    </div>
+                    
+                    <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 34pt; font-weight: 800; color: #FFF; line-height: 1.12; letter-spacing: -2px; margin-bottom: 20px; text-transform: none; text-align: left;">
+                        Pesan Roti Segar,<br>
+                        <span style="font-family: 'Lora', serif; font-style: italic; font-weight: 700; color: var(--orange);">Hangat & Nikmat.</span>
+                    </h1>
+                    
+                    <p class="text-body" style="font-size: 10pt; color: rgba(255,255,255,0.65); line-height: 1.6; max-width: 320px; margin-bottom: 30px; text-align: left; margin-left: 0;">
+                        Panduan Lengkap Penggunaan Aplikasi Roti 515 untuk Pelanggan & Administrator. Dilengkapi langkah-langkah transisi digital pemesanan bakery terpercaya.
+                    </p>
+                </div>
+                
+                <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <span style="font-family: 'Space Mono', monospace; font-size: 7.5pt; letter-spacing: 2px; color: rgba(255,255,255,0.5); display: block;">VERSI DOKUMEN</span>
+                        <span style="font-size: 8.5pt; font-weight: 700; color: #FFF;">v1.0.0-Stable</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-family: 'Space Mono', monospace; font-size: 7.5pt; letter-spacing: 2px; color: rgba(255,255,255,0.5); display: block;">TIM DEVELOPER 2026</span>
+                        <span style="font-size: 8.5pt; font-weight: 700; color: #FFF;">Politeknik Negeri Jember</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right phone mockups column (replicates landing page style) -->
+            <div class="cover-right">
+                <div class="cover-mockup-stack">
+                    <!-- Back-left mockup -->
+                    <div class="cover-mockup cover-mockup-left">
+                        <img src="assets/images/produk_pelanggan.png" alt="Katalog">
+                    </div>
+                    <!-- Center main mockup -->
+                    <div class="cover-mockup cover-mockup-center">
+                        <img src="assets/images/home.png" alt="Beranda">
+                    </div>
+                    <!-- Back-right mockup -->
+                    <div class="cover-mockup cover-mockup-right">
+                        <img src="assets/images/dashboard_admin.png" alt="Admin">
+                    </div>
+                </div>
+
+                <!-- Small website indicator -->
+                <div class="cover-badge-web">
+                    🌐 Web Landing Page Style
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: PENDAHULUAN & AKSES -->
+    <div class="page">
+        <div class="header">
+            <div class="doc-title">ROTI 515 / PENGANTAR</div>
+            <img src="assets/images/app_icon.png" alt="Logo" class="logo">
+        </div>
+        
+        <h2 class="title-large">01. PENDAHULUAN</h2>
+        <p class="text-body">Roti 515 hadir sebagai simbol transformasi digital bagi UMKM bakery. Kami tidak hanya menjual roti, kami menjual pengalaman belanja yang modern, praktis, dan terpercaya bagi setiap pelanggan.</p>
+        
+        <div class="content-grid" style="margin-top: 40px;">
+            <div>
+                <h3 class="title-medium">VISI & MISI</h3>
+                <p class="text-body">Dimulai dari keinginan untuk membantu toko roti lokal merambah dunia digital, aplikasi ini dikembangkan untuk menjembatani antara tradisi rasa dan teknologi masa depan dengan hanya satu sentuhan.</p>
+            </div>
+            <div>
+                <h3 class="title-medium">AKSES APLIKASI</h3>
+                <div class="step-box" style="border-left-color: var(--dark);">
+                    <p><strong>Web App:</strong> https://roti515.up.railway.app</p>
+                    <p><strong>Mobile App:</strong> Download dan instalasi file APK via Android device.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="mono">PENDAHULUAN</span>
+            <span class="mono">PAGE 01</span>
+        </div>
+    </div>
+
+    <!-- PAGE 3: PANDUAN PELANGGAN 1 (LOGIN & PRODUK) -->
+    <div class="page">
+        <div class="header">
+            <div class="doc-title">ROTI 515 / PANDUAN PELANGGAN</div>
+            <img src="assets/images/app_icon.png" alt="Logo" class="logo">
+        </div>
+        
+        <h2 class="title-large">02. EKSPLORASI APLIKASI</h2>
+        
+        <div class="content-grid">
+            <div class="step-box">
+                <h4>A. REGISTRASI & LOGIN</h4>
+                <p>1. Buka aplikasi Roti 515.</p>
+                <p>2. Pilih menu <strong>Login</strong> jika sudah memiliki akun, atau <strong>Daftar</strong> jika pengguna baru.</p>
+                <p>3. Masukkan alamat email dan password.</p>
+                <p>4. Setelah berhasil, Anda akan diarahkan ke Beranda.</p>
+            </div>
+            <div class="img-container">
+                <img src="assets/images/daftar.png" alt="Halaman Login/Daftar" onerror="this.src='assets/images/app_icon.png'">
+                <p class="mono" style="margin-top: 10px;">Fig 1: Layar Autentikasi</p>
+            </div>
+            
+            <div class="step-box">
+                <h4>B. MENCARI PRODUK</h4>
+                <p>1. Di halaman utama, lihat bagian Bestsellers.</p>
+                <p>2. Gunakan pencarian atau filter kategori untuk mencari roti spesifik.</p>
+                <p>3. Ketuk foto produk untuk melihat deskripsi, harga, dan stok.</p>
+            </div>
+            <div class="img-container">
+                <img src="assets/images/home.png" alt="Halaman Beranda" onerror="this.src='assets/images/app_icon.png'">
+                <p class="mono" style="margin-top: 10px;">Fig 2: Beranda & Katalog</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="mono">PANDUAN PELANGGAN</span>
+            <span class="mono">PAGE 02</span>
+        </div>
+    </div>
+
+    <!-- PAGE 4: PANDUAN PELANGGAN 2 (ORDER & CHECKOUT) -->
+    <div class="page">
+        <div class="header">
+            <div class="doc-title">ROTI 515 / TRANSAKSI</div>
+            <img src="assets/images/app_icon.png" alt="Logo" class="logo">
+        </div>
+        
+        <h2 class="title-large">03. PEMESANAN</h2>
+        
+        <div class="content-grid">
+            <div class="step-box">
+                <h4>C. MELAKUKAN PESANAN</h4>
+                <p>1. Pada halaman detail produk, atur kuantitas pesanan.</p>
+                <p>2. Tambahkan catatan opsional jika diperlukan (contoh: "dipisah plastiknya").</p>
+                <p>3. Tekan tombol <strong>Tambah ke Keranjang</strong>.</p>
+            </div>
+            <div class="img-container">
+                <img src="assets/images/detail_menu.png" alt="Detail Produk" onerror="this.src='assets/images/app_icon.png'">
+                <p class="mono" style="margin-top: 10px;">Fig 3: Detail Produk</p>
+            </div>
+            
+            <div class="step-box">
+                <h4>D. PROSES CHECKOUT</h4>
+                <p>1. Buka menu <strong>Keranjang (Cart)</strong> di navigasi bawah.</p>
+                <p>2. Periksa kembali rincian pesanan.</p>
+                <p>3. Pilih metode pembayaran dan jadwalkan pengambilan.</p>
+                <p>4. Tekan tombol <strong>Checkout</strong> untuk mengonfirmasi.</p>
+            </div>
+            <div class="img-container">
+                <img src="assets/images/checkout.png" alt="Halaman Checkout" onerror="this.src='assets/images/app_icon.png'">
+                <p class="mono" style="margin-top: 10px;">Fig 4: Halaman Keranjang</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="mono">TRANSAKSI & CHECKOUT</span>
+            <span class="mono">PAGE 03</span>
+        </div>
+    </div>
+
+    <!-- PAGE 5: PANDUAN PELANGGAN 3 (TRACKING & CANCEL) -->
+    <div class="page">
+        <div class="header">
+            <div class="doc-title">ROTI 515 / MANAJEMEN PESANAN</div>
+            <img src="assets/images/app_icon.png" alt="Logo" class="logo">
+        </div>
+        
+        <h2 class="title-large">04. STATUS PESANAN</h2>
+        
+        <div class="content-grid">
+            <div class="step-box full-col" style="margin-bottom: 0;">
+                <h4>E. MELACAK & MEMBATALKAN PESANAN</h4>
+                <p>1. Buka menu <strong>Riwayat Pesanan</strong> untuk melihat pesanan (Menunggu Pembayaran, Diproses, Siap Diambil).</p>
+                <p>2. Ketuk pada salah satu pesanan untuk melihat detail struk/invoice elektronik Anda.</p>
+                <p>3. Untuk membatalkan, pilih pesanan berstatus <strong>Menunggu Pembayaran</strong>, scroll ke bawah, lalu tekan tombol <strong>Batalkan Pesanan</strong>.</p>
+                <p style="color: #D35400; margin-top: 10px; font-weight: bold;">Catatan: Pesanan yang sudah mulai "Diproses" oleh Admin tidak dapat dibatalkan melalui aplikasi.</p>
+            </div>
+            
+            <!-- Tempat Screenshot Riwayat Pesanan -->
+            <div class="img-container">
+                <img src="assets/images/riwayat_pesanan.png" alt="Riwayat Pesanan" onerror="this.src='assets/images/app_icon.png'" style="max-height: 250px;">
+                <p class="mono" style="margin-top: 10px;">Fig 5: Riwayat Pesanan</p>
+            </div>
+
+            <!-- Tempat Screenshot Batal Pesanan -->
+            <div class="img-container">
+                <img src="assets/images/batalkan_pesanan.png" alt="Pembatalan Pesanan" onerror="this.src='assets/images/app_icon.png'" style="max-height: 250px;">
+                <p class="mono" style="margin-top: 10px;">Fig 6: Detail & Batal Pesanan</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="mono">PELACAKAN & PEMBATALAN</span>
+            <span class="mono">PAGE 04</span>
+        </div>
+    </div>
+
+    <!-- PAGE 6: PANDUAN ADMIN -->
+    <div class="page">
+        <div class="header">
+            <div class="doc-title">ROTI 515 / KENDALI ADMIN</div>
+            <img src="assets/images/app_icon.png" alt="Logo" class="logo">
+        </div>
+        
+        <h2 class="title-large">05. PANDUAN ADMIN</h2>
+        
+        <div class="content-grid">
+            <div class="step-box">
+                <h4>A. DASHBOARD & STATISTIK</h4>
+                <p>Admin memiliki panel khusus untuk melihat pergerakan penjualan, pesanan masuk terbaru, dan pendapatan harian. Admin wajib mengawasi status pesanan di sini.</p>
+            </div>
+            <div class="img-container">
+                <img src="assets/images/dashboard_admin.png" alt="Dashboard Admin" onerror="this.src='assets/images/app_icon.png'" style="max-height: 200px;">
+                <p class="mono" style="margin-top: 10px;">Fig 7: Dashboard Utama</p>
+            </div>
+            
+            <div class="step-box">
+                <h4>B. KELOLA PRODUK & STOK</h4>
+                <p>Menu kelola produk digunakan untuk menambah varian roti baru, memperbarui harga, hingga mengatur stok produk secara real-time yang langsung tampil di layar pelanggan.</p>
+            </div>
+            <div class="img-container">
+                <img src="assets/images/kelola_produk_admin.png" alt="Kelola Produk" onerror="this.src='assets/images/app_icon.png'" style="max-height: 200px;">
+                <p class="mono" style="margin-top: 10px;">Fig 8: Manajemen Katalog</p>
+            </div>
+        </div>
+
+        <div class="step-box full-col" style="border-left-color: var(--dark);">
+            <h4>ALUR SISTEM (SYSTEM FLOW)</h4>
+            <p class="mono" style="font-size: 1rem; color: var(--dark); margin-top: 10px;">PELANGGAN PESAN &rarr; CHECKOUT &rarr; ADMIN KONFIRMASI (PROSES) &rarr; PRODUKSI &rarr; SIAP DIAMBIL &rarr; SELESAI.</p>
+        </div>
+
+        <div class="footer">
+            <span class="mono">ADMIN PANEL</span>
+            <span class="mono">PAGE 05</span>
+        </div>
+    </div>
+
+</body>
+</html>
