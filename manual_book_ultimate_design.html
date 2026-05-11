@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Portrait Ready - Manual Book Roti 515</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Lora:ital,wght@0,700;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #D47311;
+            --orange-dark: #A85A0A;
+            --dark: #1A0E04;
+            --bg-grid: #E8E8E8;
+            --white: #FFFFFF;
+        }
+
+        /* RESET & PRINT SETUP PORTRAIT */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        body { 
+            background: #f0f0f0; 
+            font-family: 'Outfit', sans-serif; 
+            color: var(--dark); 
+        }
+
+        /* CONTAINER BUKU */
+        .book {
+            width: 210mm; /* Lebar A4 Portrait */
+            margin: 0 auto;
+        }
+
+        /* SATU HALAMAN PENUH */
+        .page {
+            width: 210mm;
+            height: 297mm; /* Tinggi A4 */
+            padding: 30mm 20mm;
+            background: var(--white);
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-grid {
+            background-image: 
+                linear-gradient(var(--bg-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+            background-size: 10mm 10mm;
+        }
+
+        .page-orange { background: var(--orange) !important; color: var(--white); }
+        .page-orange .page-grid {
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+        }
+
+        /* TYPOGRAPHY */
+        .title-huge { font-size: 60pt; font-weight: 900; line-height: 0.8; letter-spacing: -3px; text-transform: uppercase; margin-bottom: 20px; }
+        .title-large { font-size: 35pt; font-weight: 900; line-height: 0.9; text-transform: uppercase; margin-bottom: 20px; }
+        .tag { font-family: 'Space Mono', monospace; font-size: 8pt; letter-spacing: 4px; font-weight: 700; margin-bottom: 15px; display: block; }
+        .page-orange .tag { color: rgba(255,255,255,0.7); }
+
+        .desc { font-size: 11pt; max-width: 100%; line-height: 1.4; color: #444; margin-bottom: 30px; }
+        .page-orange .desc { color: rgba(255,255,255,0.9); }
+
+        /* IMAGERY (Optimal untuk HP/Portrait) */
+        .imagery-box {
+            margin-top: 10px;
+            border: 2px solid var(--dark);
+            padding: 5px;
+            background: white;
+            text-align: center;
+        }
+        .imagery-box img { width: 100%; max-height: 500px; display: block; object-fit: contain; }
+        .page-orange .imagery-box { border-color: white; }
+
+        /* SWATCHES */
+        .swatches { display: flex; gap: 10px; margin-top: 20px; }
+        .swatch-item { flex: 1; height: 25mm; border-radius: 2px; padding: 10px; font-size: 7pt; font-weight: bold; border: 1px solid rgba(0,0,0,0.1); }
+
+        /* FOOTER */
+        .p-num { position: absolute; bottom: 15mm; font-weight: 900; font-size: 12pt; }
+        .p-left { left: 15mm; }
+        .p-right { right: 15mm; color: inherit; }
+
+        /* COVER */
+        .cover-logo { width: 120px; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .page-cover {
+            background-image: url('docs/hero_bg.png');
+            background-size: cover;
+            background-position: center;
+            color: var(--white);
+        }
+        .page-cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                rgba(26,14,4,0.96) 0%,
+                rgba(26,14,4,0.85) 45%,
+                rgba(26,14,4,0.40) 75%,
+                rgba(26,14,4,0.2) 100%
+            );
+            z-index: 1;
+        }
+        .page-cover > * {
+            position: relative;
+            z-index: 2;
+        }
+        /* cover split layout */
+        .cover-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        .cover-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .cover-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 100%;
+        }
+        .cover-mockup-stack {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            margin-top: 20px;
+        }
+        .cover-mockup {
+            position: absolute;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.75;
+            transition: all 0.3s ease;
+        }
+        .cover-mockup img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .cover-mockup-center {
+            width: 120px;
+            height: 250px;
+            left: 50%;
+            top: 40px;
+            transform: translateX(-50%);
+            z-index: 3;
+            border-radius: 15px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.15);
+            opacity: 1;
+        }
+        .cover-mockup-left {
+            width: 100px;
+            height: 210px;
+            left: 0%;
+            bottom: 60px;
+            z-index: 1;
+            transform: rotate(-8deg);
+        }
+        .cover-mockup-right {
+            width: 100px;
+            height: 210px;
+            right: 0%;
+            bottom: 60px;
+            z-index: 2;
+            transform: rotate(8deg);
+        }
+        .cover-badge-web {
+            margin-top: 10px;
+            background: rgba(212,115,17,0.15);
+            border: 1px solid rgba(212,115,17,0.3);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 7.5pt;
+            color: #FFA34D;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @media screen {
+            body { padding: 40px 0; }
+            .page { margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="book">
+        
+        <!-- HALAMAN 1: COVER -->
+        <div class="page page-cover">
+            <div class="cover-grid">
+                <!-- Left content column -->
+                <div class="cover-left">
+                    <div>
+                        <!-- App Icon only (as requested) -->
+                        <div style="margin-top: 5mm; margin-bottom: 25mm;">
+                            <img src="assets/images/app_icon.png" alt="App Icon" style="width: 70px; height: 70px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);">
+                        </div>
+
+                        <div class="badge" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 50px; padding: 6px 16px; font-size: 8pt; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.8); text-transform: uppercase; margin-bottom: 15px;">
+                            <span class="badge-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--orange); display: inline-block; box-shadow: 0 0 8px var(--orange);"></span>
+                            ROTI 515 · MANUAL BOOK
+                        </div>
+                        
+                        <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 34pt; font-weight: 800; color: #FFF; line-height: 1.12; letter-spacing: -2px; margin-bottom: 20px; text-transform: none; text-align: left;">
+                            Pesan Roti Segar,<br>
+                            <span style="font-family: 'Lora', serif; font-style: italic; font-weight: 700; color: var(--orange);">Hangat & Nikmat.</span>
+                        </h1>
+                        
+                        <p class="desc" style="font-size: 10pt; color: rgba(255,255,255,0.65); line-height: 1.6; max-width: 320px; margin-bottom: 30px; text-align: left; margin-left: 0;">
+                            Panduan Lengkap Penggunaan Aplikasi Roti 515 untuk Pelanggan & Administrator. Dilengkapi langkah-langkah transisi digital pemesanan bakery terpercaya.
+                        </p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div>
+                            <span style="font-family: 'Space Mono', monospace; font-size: 7.5pt; letter-spacing: 2px; color: rgba(255,255,255,0.5); display: block;">VERSI DOKUMEN</span>
+                            <span style="font-size: 8.5pt; font-weight: 700; color: #FFF;">v1.0.0-Stable</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-family: 'Space Mono', monospace; font-size: 7.5pt; letter-spacing: 2px; color: rgba(255,255,255,0.5); display: block;">TIM DEVELOPER 2026</span>
+                            <span style="font-size: 8.5pt; font-weight: 700; color: #FFF;">Politeknik Negeri Jember</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right phone mockups column (replicates landing page style) -->
+                <div class="cover-right">
+                    <div class="cover-mockup-stack">
+                        <!-- Back-left mockup -->
+                        <div class="cover-mockup cover-mockup-left">
+                            <img src="assets/images/produk_pelanggan.png" alt="Katalog">
+                        </div>
+                        <!-- Center main mockup -->
+                        <div class="cover-mockup cover-mockup-center">
+                            <img src="assets/images/home.png" alt="Beranda">
+                        </div>
+                        <!-- Back-right mockup -->
+                        <div class="cover-mockup cover-mockup-right">
+                            <img src="assets/images/dashboard_admin.png" alt="Admin">
+                        </div>
+                    </div>
+
+                    <!-- Small website indicator -->
+                    <div class="cover-badge-web">
+                        🌐 Web Landing Page Style
+                    </div>
+                </div>
+            </div>
+            <span class="p-num p-right">01</span>
+        </div>
+
+        <!-- HALAMAN 2: STORY -->
+        <div class="page page-grid">
+            <span class="tag">02 / INTRODUCTION</span>
+            <h2 class="title-large">OUR<br><span style="color: var(--orange);">STORY.</span></h2>
+            <p class="desc">Roti 515 hadir untuk menjembatani antara rasa tradisional dan teknologi modern, menciptakan ekosistem bakery yang efisien dan inklusif.</p>
+            <div class="imagery-box">
+                <img src="assets/images/home.png">
+            </div>
+            <p style="font-size: 8pt; margin-top: 10px; color: #999; font-style: italic;">Gbr 1.1: Tampilan Discovery & Katalog Aplikasi</p>
+            <span class="p-num p-right">02</span>
+        </div>
+
+        <!-- HALAMAN 3: CUSTOMER GUIDE -->
+        <div class="page page-grid">
+            <span class="tag">03 / CUSTOMER GUIDE</span>
+            <h2 class="title-large">PROCESS<br><span style="color: var(--orange);">ORDER.</span></h2>
+            <p class="desc">Proses pendaftaran akun dan pemesanan dirancang agar sangat intuitif bagi semua kalangan pengguna.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="imagery-box">
+                    <img src="assets/images/daftar.png">
+                    <p style="font-size: 7pt; margin-top: 5px;">Pendaftaran Akun</p>
+                </div>
+                <div class="imagery-box">
+                    <img src="assets/images/checkout.png">
+                    <p style="font-size: 7pt; margin-top: 5px;">Halaman Checkout</p>
+                </div>
+            </div>
+            <span class="p-num p-right">03</span>
+        </div>
+
+        <!-- HALAMAN 4: ADMIN CONTROL -->
+        <div class="page page-orange page-grid">
+            <span class="tag">04 / ADMIN CONTROL</span>
+            <h2 class="title-huge">ADMIN<br>PANEL.</h2>
+            <p class="desc">Kendali penuh operasional bisnis mulai dari pantauan statistik hingga manajemen ketersediaan stok produk.</p>
+            <div class="imagery-box">
+                <img src="assets/images/dashboard_admin.png">
+            </div>
+            <span class="p-num p-right">04</span>
+        </div>
+
+        <!-- HALAMAN 5: STOCK MANAGEMENT -->
+        <div class="page page-grid">
+            <span class="tag">05 / INVENTORY</span>
+            <h2 class="title-large">STOCK<br><span style="color: var(--orange);">UPDATE.</span></h2>
+            <p class="desc">Pembaruan stok secara real-time memastikan pelanggan hanya memesan produk yang benar-benar tersedia.</p>
+            <div class="imagery-box">
+                <img src="assets/images/kelola_produk_admin.png">
+            </div>
+            <span class="p-num p-right">05</span>
+        </div>
+
+        <!-- HALAMAN 6: COLORS & TECH -->
+        <div class="page page-grid">
+            <span class="tag">06 / SPECIFICATION</span>
+            <h2 class="title-large">TECH<br><span style="color: var(--orange);">STACK.</span></h2>
+            <div style="background: var(--gray); padding: 20px; border: 1px solid #EEE; margin-bottom: 30px;">
+                <p style="font-size: 0.9rem;"><strong>Frontend:</strong> React/Vue (HTML5/CSS3)<br>
+                <strong>Backend:</strong> Node.js & Express<br>
+                <strong>Database:</strong> PostgreSQL<br>
+                <strong>Hosting:</strong> Railway Cloud</p>
+            </div>
+            <h3 style="margin-bottom: 15px;">BRAND COLORS</h3>
+            <div class="swatches">
+                <div class="swatch-item" style="background: var(--orange);">#FF7F00</div>
+                <div class="swatch-item" style="background: var(--dark); color: white;">#111111</div>
+                <div class="swatch-item" style="background: white;">#FFFFFF</div>
+            </div>
+            <span class="p-num p-right">06</span>
+        </div>
+
+    </div>
+
+</body>
+</html>
